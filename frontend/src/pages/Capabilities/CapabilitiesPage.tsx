@@ -1,9 +1,32 @@
-import { Typography } from "@mui/material";
+import { Box, Typography } from "@mui/material";
 
-export default function ApplicationsPage() {
+import PortfolioCapabilityStatistics from "../../components/capability/PortfolioCapabilityStatistics";
+import CapabilityTable from "../../components/capability/CapabilityTable";
+
+export default function CapabilityPage() {
+
     return (
-        <Typography variant="h4">
-            Applications
-        </Typography>
+
+        <Box sx={{ p: 4 }}>
+
+            <Typography
+                variant="h4"
+
+                sx={{ mb: 3 }}
+            >
+                Business Capabilities
+            </Typography>
+
+            <PortfolioCapabilityStatistics />
+
+            <Box sx={{ mt: 4 }}>
+
+                <CapabilityTable />
+
+            </Box>
+
+        </Box>
+
     );
+
 }

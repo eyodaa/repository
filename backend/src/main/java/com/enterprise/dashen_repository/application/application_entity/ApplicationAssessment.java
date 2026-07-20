@@ -32,7 +32,10 @@ public class ApplicationAssessment extends BaseEntity {
     private Integer satisfaction;
 
     // Cost
-    private Integer totalCostOwnership;
+    private Integer licenseCost;
+    private Integer maintenanceCost;
+    private Integer indirectCost;
+    private Integer otherCost;
 
     public Application getApplication() {
         return application;
@@ -154,11 +157,36 @@ public class ApplicationAssessment extends BaseEntity {
         this.satisfaction = satisfaction;
     }
 
-    public Integer getTotalCostOwnership() {
-        return totalCostOwnership;
+    public Integer getLicenseCost() {
+        return licenseCost;
     }
 
-    public void setTotalCostOwnership(Integer totalCostOwnership) {
-        this.totalCostOwnership = totalCostOwnership;
+    public void setLicenseCost(Integer licenseCost) {
+        this.licenseCost = licenseCost;
     }
+
+    public Integer getMaintenanceCost() {
+        return maintenanceCost;
+    }
+
+    public void setMaintenanceCost(Integer maintenanceCost) {
+        this.maintenanceCost = maintenanceCost;
+    }
+
+    public Integer getIndirectCost() {
+        return indirectCost;
+    }
+
+    public void setIndirectCost(Integer indirectCost) {
+        this.indirectCost = indirectCost;
+    }
+
+    public Integer getOtherCost() {
+        return otherCost;
+    }
+
+    public void setOtherCost(Integer otherCost) {
+        this.otherCost = otherCost;
+    }
+
 }

@@ -53,7 +53,10 @@ public class ApplicationAssessmentService {
         assessment.setUsability(request.getUsability());
         assessment.setSatisfaction(request.getSatisfaction());
 
-        assessment.setTotalCostOwnership(request.getTotalCostOwnership());
+        assessment.setLicenseCost(request.getLicenseCost());
+        assessment.setMaintenanceCost(request.getMaintenanceCost());
+        assessment.setIndirectCost(request.getIndirectCost());
+        assessment.setOtherCost(request.getOtherCost());
 
         ApplicationAssessment saved = assessmentRepository.save(assessment);
 
@@ -106,7 +109,10 @@ public class ApplicationAssessmentService {
         response.setUsability(assessment.getUsability());
         response.setSatisfaction(assessment.getSatisfaction());
 
-        response.setTotalCostOwnership(assessment.getTotalCostOwnership());
+        response.setLicenseCost(assessment.getLicenseCost());
+        response.setMaintenanceCost(assessment.getMaintenanceCost());
+        response.setIndirectCost(assessment.getIndirectCost());
+        response.setOtherCost(assessment.getOtherCost());
 
         return response;
     }
@@ -119,4 +125,5 @@ public class ApplicationAssessmentService {
 
         return map(assessment);
     }
+
 }

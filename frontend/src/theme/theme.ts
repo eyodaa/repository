@@ -1,42 +1,91 @@
-import { createTheme } from "@mui/material/styles";
+import { createTheme } from "@mui/material";
+import { palette } from "./palette";
+import { typography } from "./typography";
 
-const theme = createTheme({
+export const theme = createTheme({
+
     palette: {
-        mode: "light",
+        mode: "dark",
 
-        primary: {
-            main: "#1565C0",
-        },
+        primary: palette.primary,
+        secondary: palette.secondary,
+        success: palette.success,
+        warning: palette.warning,
+        error: palette.error,
 
-        secondary: {
-            main: "#00897B",
-        },
+        divider: palette.divider,
 
         background: {
-            default: "#F4F6F8",
-            paper: "#FFFFFF",
+            default: palette.background.default,
+            paper: palette.background.paper,
         },
+
+        text: palette.text,
     },
+
+    typography,
 
     shape: {
-        borderRadius: 8,
+        borderRadius: 14,
     },
 
-    typography: {
-        fontFamily: `"Inter", "Roboto", "Helvetica", "Arial", sans-serif`,
+    components: {
 
-        h4: {
-            fontWeight: 700,
+        MuiPaper: {
+
+            styleOverrides: {
+
+                root: {
+
+                    backgroundColor: palette.background.card,
+
+                    border: "1px solid #334155",
+
+                    backgroundImage: "none",
+
+                    boxShadow:
+                        "0 8px 24px rgba(0,0,0,.35)",
+                },
+            },
         },
 
-        h5: {
-            fontWeight: 600,
+        MuiCard: {
+
+            styleOverrides: {
+
+                root: {
+
+                    backgroundColor: palette.background.card,
+
+                    border: "1px solid #334155",
+                },
+            },
         },
 
-        h6: {
-            fontWeight: 600,
+        MuiTableHead: {
+
+            styleOverrides: {
+
+                root: {
+
+                    background: "#172033",
+                },
+            },
+        },
+
+        MuiAppBar: {
+
+            styleOverrides: {
+
+                root: {
+
+                    background: palette.background.sidebar,
+
+                    boxShadow: "none",
+
+                    borderBottom: "1px solid #334155",
+                },
+            },
         },
     },
 });
-
-export default theme;

@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/technologies")
+@CrossOrigin(origins = "*")
 public class TechnologyController {
 
     private final TechnologyService technologyService;

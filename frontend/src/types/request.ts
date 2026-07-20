@@ -22,5 +22,8 @@ export interface ApplicationAssessmentRequest {
     satisfaction: number;
 
     // Cost
-    totalCostOwnership: number;
+    licenseCost: number;
+    maintenanceCost: number;
+    indirectCost: number;
+    otherCost: number;
 }

@@ -16,6 +16,8 @@ import { useEffect, useState } from "react";
 
 import { applicationService } from "../../services/applicationService";
 
+import ApplicationCube from "./EnterpriseCube/ApplicationCube";
+
 import type { ApplicationAnalysisResponse } from "../../types/analysis";
 
 interface AnalysisSectionProps {
@@ -268,7 +270,7 @@ export default function AnalysisSection({
                             variant="h5"
                             sx={{
                                 color: getPassColor(
-                                    analysis.tcoPass
+                                    analysis.totalCostOwnershipPass
                                 ),
                             }}
                         >
@@ -304,7 +306,48 @@ export default function AnalysisSection({
                     No analysis available.
                 </Alert>
             )}
+            {analysis && (
 
+                <Box
+                    sx={{
+                        mt: 5,
+                        display: "flex",
+                        flexDirection: "column",
+                        alignItems: "center",
+                    }}
+                >
+
+                    <Divider sx={{ width: "100%", mb: 3 }} />
+
+                    <Typography
+                        variant="h6"
+                        sx={{
+                            mb: 2,
+                            fontWeight: 700,
+                        }}
+                    >
+                        Digital Twin Visualization
+                    </Typography>
+
+                    <Box
+                        sx={{
+                            width: "100%",
+                            height: 420,
+                            borderRadius: 3,
+                            overflow: "hidden",
+                            background:
+                                "linear-gradient(180deg,#1E293B 0%, #111827 100%)",
+                            border: "1px solid #334155",
+                        }}
+                    >
+                        <ApplicationCube
+                            pattern={analysis.pattern}
+                        />
+                    </Box>
+
+                </Box>
+
+            )}
         </Paper>
 
     );

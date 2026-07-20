@@ -13,6 +13,8 @@ public interface ArtifactRelationshipRepository extends JpaRepository<ArtifactRe
 
     List<ArtifactRelationship> findByTargetArtifactId(Long targetArtifactId);
 
+    List<ArtifactRelationship> findBySourceArtifactIdOrTargetArtifactId(Long sourceArtifactId, Long targetArtifactId);
+
     boolean existsBySourceArtifactIdAndTargetArtifactIdAndRelationshipType(
             Long sourceArtifactId,
             Long targetArtifactId,

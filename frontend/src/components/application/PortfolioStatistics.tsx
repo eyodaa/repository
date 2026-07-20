@@ -1,33 +1,71 @@
-import { Grid, Card, CardContent, Typography, Box } from "@mui/material";
+import {
+    Grid,
+    Card,
+    CardContent,
+    Typography,
+    Box,
+    CircularProgress,
+} from "@mui/material";
 
-const statistics = [
-    {
-        title: "Applications",
-        value: 142,
-        color: "#1976d2",
-    },
-    {
-        title: "Active",
-        value: 118,
-        color: "#2e7d32",
-    },
-    {
-        title: "Average Health",
-        value: "4.2",
-        color: "#ed6c02",
-    },
-    {
-        title: "Annual TCO",
-        value: "$4.3M",
-        color: "#7b1fa2",
-    },
-];
+import { useApplications } from "../../hooks/useApplications";
 
 export default function PortfolioStatistics() {
+
+    const {
+        applications,
+        loading,
+    } = useApplications();
+
+    if (loading) {
+        return (
+            <Box
+                sx={{
+                    display: "flex",
+                    justifyContent: "center",
+                    py: 3,
+                }}
+            >
+                <CircularProgress />
+            </Box>
+        );
+    }
+
+    const totalApplications = applications.length;
+
+    const activeApplications = applications.filter(
+        app => app.lifecycleStatus === "ACTIVE"
+    ).length;
+
+    const statistics = [
+        {
+            title: "Applications",
+            value: totalApplications,
+            color: "#1976d2",
+        },
+        {
+            title: "Active",
+            value: activeApplications,
+            color: "#2e7d32",
+        },
+        {
+            title: "Average Health",
+            value: "N/A",
+            color: "#ed6c02",
+        },
+        {
+            title: "Annual TCO",
+            value: "N/A",
+            color: "#7b1fa2",
+        },
+    ];
+
     return (
         <Grid container spacing={3}>
             {statistics.map((item) => (
-                <Grid key={item.title} size={{ xs: 12, sm: 6, md: 3 }}>
+                <Grid
+                    key={item.title}
+                    size={{ xs: 12, sm: 6, md: 3 }}
+                >
                     <Card
                         elevation={2}
                         sx={{

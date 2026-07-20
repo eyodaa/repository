@@ -34,7 +34,10 @@ const defaultValues: Omit<ApplicationAssessmentRequest, "applicationId"> = {
     effectiveness: 3,
     usability: 3,
     satisfaction: 3,
-    totalCostOwnership: 3,
+    licenseCost: 3,
+    maintenanceCost: 3,
+    indirectCost: 3,
+    otherCost: 3,
 };
 
 export default function AssessmentSummary({
@@ -78,7 +81,10 @@ export default function AssessmentSummary({
                 effectiveness: assessment.effectiveness,
                 usability: assessment.usability,
                 satisfaction: assessment.satisfaction,
-                totalCostOwnership: assessment.totalCostOwnership,
+                licenseCost: assessment.licenseCost,
+                maintenanceCost: assessment.maintenanceCost,
+                indirectCost: assessment.indirectCost,
+                otherCost: assessment.otherCost,
             });
 
         } catch {
@@ -287,8 +293,20 @@ export default function AssessmentSummary({
                 <Grid container spacing={2}>
 
                     {renderInput(
-                        "Total Cost of Ownership",
-                        "totalCostOwnership"
+                        "License Cost",
+                        "licenseCost"
+                    )}
+                    {renderInput(
+                        "Maintenance Cost",
+                        "maintenanceCost"
+                    )}
+                    {renderInput(
+                        "Indirect Cost",
+                        "indirectCost"
+                    )}
+                    {renderInput(
+                        "Other Cost",
+                        "otherCost"
                     )}
 
                 </Grid>

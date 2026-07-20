@@ -1,4 +1,4 @@
-import { Box, Breadcrumbs, Link, Typography, CircularProgress, Alert } from "@mui/material";
+import { Box, Breadcrumbs, Link, Typography, CircularProgress, Alert, Paper } from "@mui/material";
 import { useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 import type { Application } from "../../types/application";
@@ -9,6 +9,8 @@ import GeneralInformation from "../../components/application/GeneralInformation"
 import BusinessInformation from "../../components/application/BusinessInformation";
 import AssessmentSummary from "../../components/application/AssessmentSummary";
 import AnalysisSection from "../../components/application/AnalysisSection";
+import { toast } from "react-toastify";
+import ArtifactRelationshipTable from "../../components/application/ArtifactRelationshipTable";
 
 export default function ApplicationDetailsPage() {
     const { id } = useParams<{ id: string }>();
@@ -36,6 +38,17 @@ export default function ApplicationDetailsPage() {
 
         fetchApplication();
     }, [id]);
+
+    const handleUpdate = async (updatedApplication: Application) => {
+        try {
+            const response = await applicationService.update(updatedApplication.id, updatedApplication);
+            setApplication(response.data);
+            return Promise.resolve();
+        } catch (err) {
+            console.error(err);
+            return Promise.reject(err);
+        }
+    };
 
     if (loading) {
         return (
@@ -69,10 +82,10 @@ export default function ApplicationDetailsPage() {
 
             <Box sx={{ display: 'flex', gap: 3, mb: 3, flexDirection: { xs: 'column', lg: 'row' } }}>
                 <Box sx={{ flex: 1 }}>
-                    <GeneralInformation application={application} />
+                    <GeneralInformation application={application} onUpdate={handleUpdate} />
                 </Box>
                 <Box sx={{ flex: 1 }}>
-                    <BusinessInformation application={application} />
+                    <BusinessInformation application={application} onUpdate={handleUpdate} />
                 </Box>
             </Box>
 
@@ -88,7 +101,23 @@ export default function ApplicationDetailsPage() {
                         applicationId={application.id}
                         refreshTrigger={assessmentSubmitted}
                     />
+
                 </Box>
+
+            </Box>
+            <Box sx={{ mt: 4, p: 3, borderRadius: 3 }}>
+
+                <Typography
+                    variant="h6"
+                    sx={{ mb: 2 }}
+                >
+                    Relationships
+                </Typography>
+
+                <ArtifactRelationshipTable
+                    artifactId={application.id}
+                />
+
             </Box>
         </Box>
     );

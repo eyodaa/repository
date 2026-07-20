@@ -74,6 +74,15 @@ public class ArtifactRelationshipService {
         relationshipRepository.deleteById(id);
     }
 
+    public List<RelationshipResponse> findByArtifactId(Long artifactId) {
+        List<ArtifactRelationship> relationships = relationshipRepository
+                .findBySourceArtifactIdOrTargetArtifactId(artifactId, artifactId);
+
+        return relationships.stream()
+                .map(this::map)
+                .collect(Collectors.toList());
+    }
+
     private RelationshipResponse map(ArtifactRelationship relationship) {
 
         RelationshipResponse response = new RelationshipResponse();

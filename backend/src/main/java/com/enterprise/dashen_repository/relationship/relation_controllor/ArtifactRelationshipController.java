@@ -37,4 +37,11 @@ public class ArtifactRelationshipController {
     public void delete(@PathVariable Long id) {
         service.delete(id);
     }
+
+    @GetMapping("/artifact/{artifactId}")
+    public List<RelationshipResponse> getByArtifact(
+            @PathVariable Long artifactId) {
+
+        return service.findByArtifactId(artifactId);
+    }
 }

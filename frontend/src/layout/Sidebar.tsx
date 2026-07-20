@@ -43,7 +43,7 @@ export default function Sidebar({ open, onToggle }: SidebarProps) {
             sx={{
                 width: open ? SIDEBAR_WIDTH : 0,
                 height: "100vh",
-                bgcolor: "#ffffff",
+                bgcolor: "#111827",
                 borderRight: open ? "1px solid #e5e7eb" : "0px solid transparent",
                 overflowX: "hidden",
                 overflowY: "auto",

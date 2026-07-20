@@ -26,5 +26,8 @@ public class ApplicationAssessmentRequest {
     private Integer usability;
     private Integer satisfaction;
 
-    private Integer totalCostOwnership;
+    private Integer licenseCost;
+    private Integer maintenanceCost;
+    private Integer indirectCost;
+    private Integer otherCost;
 }

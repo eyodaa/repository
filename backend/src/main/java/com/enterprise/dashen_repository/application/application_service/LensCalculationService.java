@@ -40,7 +40,11 @@ public class LensCalculationService {
 
     public double calculateTCO(ApplicationAssessment a) {
 
-        return a.getTotalCostOwnership();
-    }
+        int license = a.getLicenseCost() == null ? 3 : a.getLicenseCost();
+        int maintenance = a.getMaintenanceCost() == null ? 3 : a.getMaintenanceCost();
+        int indirect = a.getIndirectCost() == null ? 3 : a.getIndirectCost();
+        int other = a.getOtherCost() == null ? 3 : a.getOtherCost();
 
+        return (license + maintenance + indirect + other) / 4.0;
+    }
 }

@@ -4,11 +4,15 @@ export interface ApplicationAnalysisResponse {
     organizationalValue: number;
     technicalHealth: number;
     endUserPerspective: number;
+    licenseCost: number;
+    maintenanceCost: number;
+    indirectCost: number;
+    otherCost: number;
     totalCostOwnership: number;
     organizationalPass: boolean;
     technicalPass: boolean;
     endUserPass: boolean;
-    tcoPass: boolean;
+    totalCostOwnershipPass: boolean;
     pattern: string;
     disposition: string;
     priority: string;

@@ -29,7 +29,7 @@ export default function ApplicationAnalysisTable({ applicationId }: ApplicationA
         async function loadAnalysis() {
             setLoading(true);
             try {
-                const data = await analysisService.getAnalysisByApplicationId(applicationId);
+                const data = await analysisService.get(applicationId);
                 setAnalysis(data);
                 setError("");
             } catch (err) {
@@ -109,8 +109,8 @@ export default function ApplicationAnalysisTable({ applicationId }: ApplicationA
                         <TableCell>{analysis.totalCostOwnership}</TableCell>
                         <TableCell>
                             <Chip
-                                label={analysis.tcoPass ? "Pass" : "Fail"}
-                                color={analysis.tcoPass ? "success" : "error"}
+                                label={analysis.totalCostOwnershipPass ? "Pass" : "Fail"}
+                                color={analysis.totalCostOwnershipPass ? "success" : "error"}
                                 size="small"
                             />
                         </TableCell>
@@ -129,6 +129,7 @@ export default function ApplicationAnalysisTable({ applicationId }: ApplicationA
                     </TableRow>
                 </TableBody>
             </Table>
+
         </TableContainer>
     );
 }

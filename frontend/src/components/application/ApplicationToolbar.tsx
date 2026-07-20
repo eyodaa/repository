@@ -12,7 +12,29 @@ import {
 import AddIcon from "@mui/icons-material/Add";
 import UploadIcon from "@mui/icons-material/Upload";
 
-export default function ApplicationToolbar() {
+interface ApplicationToolbarProps {
+    search: string;
+    status: string;
+    criticality: string;
+
+    onSearchChange: (value: string) => void;
+    onStatusChange: (value: string) => void;
+    onCriticalityChange: (value: string) => void;
+
+    onAdd: () => void;
+    onImport?: () => void;
+}
+
+export default function ApplicationToolbar({
+    search,
+    status,
+    criticality,
+    onSearchChange,
+    onStatusChange,
+    onCriticalityChange,
+    onAdd,
+    onImport,
+}: ApplicationToolbarProps) {
     return (
         <Paper
             elevation={2}
@@ -22,38 +44,50 @@ export default function ApplicationToolbar() {
                 gap: 2,
                 alignItems: "center",
                 borderRadius: 3,
+                flexWrap: "wrap",
             }}
         >
             <TextField
                 placeholder="Search applications..."
                 size="small"
+                value={search}
+                onChange={(e) => onSearchChange(e.target.value)}
                 sx={{ width: 280 }}
             />
 
-            <FormControl size="small" sx={{ width: 170 }}>
+            <FormControl
+                size="small"
+                sx={{ width: 170 }}
+            >
                 <InputLabel>Status</InputLabel>
 
                 <Select
                     label="Status"
-                    defaultValue=""
+                    value={status}
+                    onChange={(e) => onStatusChange(e.target.value)}
                 >
                     <MenuItem value="">All</MenuItem>
-                    <MenuItem value="Active">Active</MenuItem>
-                    <MenuItem value="Retire">Retire</MenuItem>
+                    <MenuItem value="ACTIVE">Active</MenuItem>
+                    <MenuItem value="PLANNED">Planned</MenuItem>
+                    <MenuItem value="RETIRED">Retired</MenuItem>
                 </Select>
             </FormControl>
 
-            <FormControl size="small" sx={{ width: 170 }}>
+            <FormControl
+                size="small"
+                sx={{ width: 170 }}
+            >
                 <InputLabel>Criticality</InputLabel>
 
                 <Select
                     label="Criticality"
-                    defaultValue=""
+                    value={criticality}
+                    onChange={(e) => onCriticalityChange(e.target.value)}
                 >
                     <MenuItem value="">All</MenuItem>
-                    <MenuItem value="High">High</MenuItem>
-                    <MenuItem value="Medium">Medium</MenuItem>
-                    <MenuItem value="Low">Low</MenuItem>
+                    <MenuItem value="HIGH">High</MenuItem>
+                    <MenuItem value="MEDIUM">Medium</MenuItem>
+                    <MenuItem value="LOW">Low</MenuItem>
                 </Select>
             </FormControl>
 
@@ -62,6 +96,7 @@ export default function ApplicationToolbar() {
             <Button
                 variant="outlined"
                 startIcon={<UploadIcon />}
+                onClick={() => onImport?.()}
             >
                 Import
             </Button>
@@ -69,6 +104,7 @@ export default function ApplicationToolbar() {
             <Button
                 variant="contained"
                 startIcon={<AddIcon />}
+                onClick={onAdd}
             >
                 Add Application
             </Button>
