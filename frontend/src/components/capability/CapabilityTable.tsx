@@ -7,48 +7,44 @@ import {
 
 import { useNavigate } from "react-router-dom";
 
-import { useCapabilities } from "../../hooks/useCapabilities";
+import { useCapabilityNodes } from "../../hooks/useCapabilityNodes";
 
 const columns: GridColDef[] = [
 
     {
         field: "code",
         headerName: "Code",
-        width: 130,
+        width: 140,
     },
 
     {
         field: "name",
         headerName: "Capability",
         flex: 1,
-        minWidth: 260,
+        minWidth: 300,
     },
 
     {
-        field: "parentCode",
-        headerName: "Parent",
-        width: 150,
-        renderCell: (params) => {
-            const parentCode =
-                params.row.parentCode ?? "-";
-            return (
-                <Chip
-                    label={parentCode}
-                    color="default"
-                    size="small"
-                />
-            );
-        },
-    },
-
-    {
-        field: "maturityLevel",
-        headerName: "Current",
+        field: "level",
+        headerName: "Level",
         width: 120,
         renderCell: (params) => (
             <Chip
-                label={params.value ?? "-"}
+                label={`L${params.value}`}
                 color="primary"
+                size="small"
+            />
+        ),
+    },
+
+    {
+        field: "currentMaturity",
+        headerName: "Current",
+        width: 130,
+        renderCell: (params) => (
+            <Chip
+                label={params.value ?? "-"}
+                color="warning"
                 size="small"
             />
         ),
@@ -57,7 +53,7 @@ const columns: GridColDef[] = [
     {
         field: "targetMaturity",
         headerName: "Target",
-        width: 120,
+        width: 130,
         renderCell: (params) => (
             <Chip
                 label={params.value ?? "-"}
@@ -74,10 +70,10 @@ export default function CapabilityTable() {
     const navigate = useNavigate();
 
     const {
-        capabilities,
+        nodes,
         loading,
         error,
-    } = useCapabilities();
+    } = useCapabilityNodes();
 
     function handleRowClick(params: GridRowParams) {
 
@@ -104,7 +100,11 @@ export default function CapabilityTable() {
 
     if (error) {
 
-        return <Alert severity="error">{error}</Alert>;
+        return (
+            <Alert severity="error">
+                {error}
+            </Alert>
+        );
 
     }
 
@@ -114,17 +114,13 @@ export default function CapabilityTable() {
 
             <DataGrid
 
-                rows={capabilities}
+                rows={nodes}
 
                 columns={columns}
 
                 getRowId={(row) => row.id}
 
                 pageSizeOptions={[5, 10, 20]}
-
-                disableRowSelectionOnClick
-
-                onRowClick={handleRowClick}
 
                 initialState={{
                     pagination: {
@@ -134,6 +130,10 @@ export default function CapabilityTable() {
                         },
                     },
                 }}
+
+                disableRowSelectionOnClick
+
+                onRowClick={handleRowClick}
 
             />
 

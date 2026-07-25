@@ -13,120 +13,174 @@ import com.enterprise.dashen_repository.relationship.relation_repository.Artifac
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
 public class GraphService {
 
-    private final ArtifactRepository artifactRepository;
-    private final ArtifactRelationshipRepository relationshipRepository;
+        private final ArtifactRepository artifactRepository;
+        private final ArtifactRelationshipRepository relationshipRepository;
 
-    public GraphService(
-            ArtifactRepository artifactRepository,
-            ArtifactRelationshipRepository relationshipRepository) {
+        public GraphService(
+                        ArtifactRepository artifactRepository,
+                        ArtifactRelationshipRepository relationshipRepository) {
 
-        this.artifactRepository = artifactRepository;
-        this.relationshipRepository = relationshipRepository;
-    }
-
-    public GraphResponse getGraph() {
-
-        List<GraphNode> nodes = artifactRepository.findAll()
-                .stream()
-                .map(this::mapNode)
-                .collect(Collectors.toList());
-
-        List<GraphEdge> edges = relationshipRepository.findAll()
-                .stream()
-                .map(this::mapEdge)
-                .collect(Collectors.toList());
-
-        return new GraphResponse(nodes, edges);
-    }
-
-    private GraphNode mapNode(Artifact artifact) {
-
-        return new GraphNode(
-                artifact.getId(),
-                artifact.getName(),
-                artifact.getArtifactType().name());
-    }
-
-    private GraphEdge mapEdge(ArtifactRelationship relationship) {
-
-        return new GraphEdge(
-                relationship.getId(),
-                relationship.getSourceArtifact().getId(),
-                relationship.getTargetArtifact().getId(),
-                relationship.getRelationshipType().name());
-    }
-
-    public NeighborResponse getNeighbors(Long artifactId) {
-
-        Artifact artifact = artifactRepository.findById(artifactId)
-                .orElseThrow(() -> new RuntimeException("Artifact not found"));
-
-        List<NeighborDto> neighbors = new ArrayList<>();
-
-        List<ArtifactRelationship> outgoing = relationshipRepository.findBySourceArtifactId(artifactId);
-
-        for (ArtifactRelationship relationship : outgoing) {
-
-            Artifact target = relationship.getTargetArtifact();
-
-            neighbors.add(new NeighborDto(
-                    target.getId(),
-                    target.getName(),
-                    relationship.getRelationshipType().name(),
-                    "OUTGOING"));
+                this.artifactRepository = artifactRepository;
+                this.relationshipRepository = relationshipRepository;
         }
 
-        List<ArtifactRelationship> incoming = relationshipRepository.findByTargetArtifactId(artifactId);
+        public GraphResponse getGraph() {
 
-        for (ArtifactRelationship relationship : incoming) {
+                List<GraphNode> nodes = artifactRepository.findAll()
+                                .stream()
+                                .map(this::mapNode)
+                                .collect(Collectors.toList());
 
-            Artifact source = relationship.getSourceArtifact();
+                List<GraphEdge> edges = relationshipRepository.findAll()
+                                .stream()
+                                .map(this::mapEdge)
+                                .collect(Collectors.toList());
 
-            neighbors.add(new NeighborDto(
-                    source.getId(),
-                    source.getName(),
-                    relationship.getRelationshipType().name(),
-                    "INCOMING"));
+                return new GraphResponse(nodes, edges);
         }
 
-        GraphNode center = new GraphNode(
-                artifact.getId(),
-                artifact.getName(),
-                artifact.getArtifactType().name());
+        private GraphNode mapNode(Artifact artifact) {
 
-        return new NeighborResponse(center, neighbors);
-    }
-
-    private TreeNode buildTree(Artifact artifact) {
-
-        TreeNode node = new TreeNode(
-                artifact.getId(),
-                artifact.getName(),
-                artifact.getArtifactType().name());
-
-        List<ArtifactRelationship> relationships = relationshipRepository.findBySourceArtifactId(artifact.getId());
-
-        for (ArtifactRelationship relationship : relationships) {
-
-            Artifact child = relationship.getTargetArtifact();
-
-            node.getChildren().add(buildTree(child));
+                return new GraphNode(
+                                artifact.getId(),
+                                artifact.getName(),
+                                artifact.getArtifactType().name());
         }
 
-        return node;
-    }
+        private GraphEdge mapEdge(ArtifactRelationship relationship) {
 
-    public TreeNode getDependencyTree(Long artifactId) {
+                return new GraphEdge(
+                                relationship.getId(),
+                                relationship.getSourceArtifact().getId(),
+                                relationship.getTargetArtifact().getId(),
+                                relationship.getRelationshipType().name());
+        }
 
-        Artifact root = artifactRepository.findById(artifactId)
-                .orElseThrow(() -> new RuntimeException("Artifact not found"));
+        public NeighborResponse getNeighbors(Long artifactId) {
 
-        return buildTree(root);
-    }
+                Artifact artifact = artifactRepository.findById(artifactId)
+                                .orElseThrow(() -> new RuntimeException("Artifact not found"));
+
+                List<NeighborDto> neighbors = new ArrayList<>();
+
+                List<ArtifactRelationship> outgoing = relationshipRepository.findBySourceArtifactId(artifactId);
+
+                for (ArtifactRelationship relationship : outgoing) {
+
+                        Artifact target = relationship.getTargetArtifact();
+
+                        neighbors.add(new NeighborDto(
+                                        target.getId(),
+                                        target.getName(),
+                                        relationship.getRelationshipType().name(),
+                                        "OUTGOING"));
+                }
+
+                List<ArtifactRelationship> incoming = relationshipRepository.findByTargetArtifactId(artifactId);
+
+                for (ArtifactRelationship relationship : incoming) {
+
+                        Artifact source = relationship.getSourceArtifact();
+
+                        neighbors.add(new NeighborDto(
+                                        source.getId(),
+                                        source.getName(),
+                                        relationship.getRelationshipType().name(),
+                                        "INCOMING"));
+                }
+
+                GraphNode center = new GraphNode(
+                                artifact.getId(),
+                                artifact.getName(),
+                                artifact.getArtifactType().name());
+
+                return new NeighborResponse(center, neighbors);
+        }
+
+        private TreeNode buildTree(Artifact artifact, Set<Long> visited) {
+
+                TreeNode node = new TreeNode(
+                                artifact.getId(),
+                                artifact.getName(),
+                                artifact.getArtifactType().name());
+
+                if (visited.contains(artifact.getId())) {
+                        return node;
+                }
+
+                visited.add(artifact.getId());
+
+                List<ArtifactRelationship> relationships = relationshipRepository
+                                .findBySourceArtifactId(artifact.getId());
+
+                for (ArtifactRelationship relationship : relationships) {
+
+                        Artifact child = relationship.getTargetArtifact();
+
+                        node.getChildren().add(
+                                        buildTree(child, visited));
+                }
+
+                return node;
+        }
+
+        public TreeNode getDependencyTree(Long artifactId) {
+
+                Artifact root = artifactRepository.findById(artifactId)
+                                .orElseThrow(() -> new RuntimeException("Artifact not found"));
+
+                return buildTree(root, new HashSet<>());
+        }
+
+        public GraphResponse getArtifactGraph(Long artifactId) {
+
+                Artifact center = artifactRepository.findById(artifactId)
+                                .orElseThrow(() -> new RuntimeException("Artifact not found"));
+
+                List<GraphNode> nodes = new ArrayList<>();
+                List<GraphEdge> edges = new ArrayList<>();
+
+                Set<Long> visited = new HashSet<>();
+
+                nodes.add(mapNode(center));
+                visited.add(center.getId());
+
+                List<ArtifactRelationship> relationships = relationshipRepository
+                                .findBySourceArtifactIdOrTargetArtifactId(
+                                                artifactId,
+                                                artifactId);
+
+                for (ArtifactRelationship relationship : relationships) {
+
+                        Artifact source = relationship.getSourceArtifact();
+                        Artifact target = relationship.getTargetArtifact();
+
+                        if (!visited.contains(source.getId())) {
+
+                                nodes.add(mapNode(source));
+                                visited.add(source.getId());
+
+                        }
+
+                        if (!visited.contains(target.getId())) {
+
+                                nodes.add(mapNode(target));
+                                visited.add(target.getId());
+
+                        }
+
+                        edges.add(mapEdge(relationship));
+                }
+
+                return new GraphResponse(nodes, edges);
+        }
+
 }

@@ -1,40 +1,80 @@
-import { useCapabilities } from "../../hooks/useCapabilities";
+import {
+    Box,
+    CircularProgress,
+    Alert,
+    Typography
+} from "@mui/material";
 
-interface Props {
+import {
+    RichTreeView
+} from "@mui/x-tree-view/RichTreeView";
 
-    selected: string | null;
+import { useNavigate } from "react-router-dom";
 
-    onSelect: (code: string) => void;
+import { useCapabilityTree } from "../../hooks/useCapabilityTree";
 
-}
+export default function CapabilityExplorer() {
 
-export default function CapabilityExplorer({
-
-    selected,
-
-    onSelect,
-
-}: Props) {
+    const navigate = useNavigate();
 
     const {
 
-        capabilities,
+        tree,
 
         loading,
 
-    } = useCapabilities();
+        error,
+
+    } = useCapabilityTree();
 
     if (loading) {
 
-        return <>Loading...</>;
+        return <CircularProgress />;
+
+    }
+
+    if (error) {
+
+        return <Alert severity="error">
+
+            {error}
+
+        </Alert>;
 
     }
 
     return (
 
-        <>
-            Tree coming next...
-        </>
+        <Box>
+
+            <Typography
+                variant="h5"
+                sx={{ mb: 2 }}
+            >
+
+                Business Capability Explorer
+
+            </Typography>
+
+            <RichTreeView
+
+                items={tree}
+
+                getItemId={(item) => String(item.id)}
+
+                getItemLabel={(item) => item.name}
+
+                getItemChildren={(item) => item.children}
+
+                onItemClick={(event, id) => {
+
+                    navigate(`/capabilities/${id}`);
+
+                }}
+
+            />
+
+        </Box>
 
     );
 

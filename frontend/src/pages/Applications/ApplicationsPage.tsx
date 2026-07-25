@@ -5,6 +5,7 @@ import ApplicationToolbar from "../../components/application/ApplicationToolbar"
 import PortfolioStatistics from "../../components/application/PortfolioStatistics";
 import ApplicationTable from "../../components/application/ApplicationTable";
 import CreateApplicationDialog from "../../components/application/CreateApplicationDialog";
+import ApplicationImportDialog from "../../components/application/ApplicationImportDialog";
 
 export default function ApplicationsPage() {
 
@@ -13,14 +14,13 @@ export default function ApplicationsPage() {
     const [criticality, setCriticality] = useState("");
 
     const [openCreateDialog, setOpenCreateDialog] = useState(false);
+    const [openImportDialog, setOpenImportDialog] = useState(false);
 
     const handleCreated = () => {
-        // easiest solution for now
         window.location.reload();
     };
 
     return (
-
         <Box sx={{ p: 3 }}>
 
             <ApplicationToolbar
@@ -31,7 +31,7 @@ export default function ApplicationsPage() {
                 onStatusChange={setStatus}
                 onCriticalityChange={setCriticality}
                 onAdd={() => setOpenCreateDialog(true)}
-                onImport={() => { }}
+                onImport={() => setOpenImportDialog(true)}
             />
 
             <Box sx={{ mt: 3 }}>
@@ -56,7 +56,12 @@ export default function ApplicationsPage() {
                 onCreated={handleCreated}
             />
 
-        </Box>
+            <ApplicationImportDialog
+                open={openImportDialog}
+                onClose={() => setOpenImportDialog(false)}
+                onImported={handleCreated}
+            />
 
+        </Box>
     );
 }

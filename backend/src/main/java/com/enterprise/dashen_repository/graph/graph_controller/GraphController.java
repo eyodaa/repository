@@ -21,6 +21,12 @@ public class GraphController {
         this.graphService = graphService;
     }
 
+    @GetMapping("/artifact/{id}")
+    public GraphResponse getArtifactGraph(
+            @PathVariable Long id) {
+        return graphService.getArtifactGraph(id);
+    }
+
     @GetMapping
     public GraphResponse getGraph() {
         return graphService.getGraph();
@@ -35,4 +41,5 @@ public class GraphController {
     public TreeNode getTree(@PathVariable Long id) {
         return graphService.getDependencyTree(id);
     }
+
 }

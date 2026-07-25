@@ -5,7 +5,7 @@ public class RelationshipArtifactResponse {
     private Long id;
     private String code;
     private String name;
-
+    private String artifactType;
     public RelationshipArtifactResponse() {
     }
 
@@ -31,5 +31,13 @@ public class RelationshipArtifactResponse {
 
     public void setName(String name) {
         this.name = name;
+    }
+    
+    public String getArtifactType() {
+        return artifactType;
+    }
+    
+    public void setArtifactType(String artifactType) {
+        this.artifactType = artifactType;
     }
 }

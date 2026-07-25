@@ -30,5 +30,19 @@ export const applicationService = {
     getAnalysis(applicationId: number | string) {
         return api.get(`/application-analysis/${applicationId}`);
     },
+    import(file: File) {
+        const formData = new FormData();
+        formData.append("file", file);
+
+        return api.post(
+            "/application-import/import",
+            formData,
+            {
+                headers: {
+                    "Content-Type": "multipart/form-data",
+                },
+            }
+        );
+    }
 
 };

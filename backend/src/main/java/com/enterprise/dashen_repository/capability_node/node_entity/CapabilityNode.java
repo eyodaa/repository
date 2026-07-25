@@ -1,11 +1,14 @@
 package com.enterprise.dashen_repository.capability_node.node_entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 import jakarta.persistence.*;
 
 import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "capability_nodes")
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class CapabilityNode {
 
     @Id

@@ -1,11 +1,15 @@
 package com.enterprise.dashen_repository.capability_node.node_service;
 
+import com.enterprise.dashen_repository.capability_node.dto.CapabilityTreeDto;
 import com.enterprise.dashen_repository.capability_node.node_entity.CapabilityNode;
 import com.enterprise.dashen_repository.capability_node.node_repository.CapabilityNodeRepository;
 
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class CapabilityNodeService {
@@ -64,4 +68,50 @@ public class CapabilityNodeService {
         repository.deleteById(id);
     }
 
+    public List<CapabilityTreeDto> getTree() {
+
+        List<CapabilityNode> nodes = repository.findAll();
+
+        Map<Long, CapabilityTreeDto> map = new HashMap<>();
+
+        for (CapabilityNode node : nodes) {
+
+            CapabilityTreeDto dto = new CapabilityTreeDto(
+                    node.getId(),
+                    node.getCode(),
+                    node.getName(),
+                    node.getLevel(),
+                    node.getParent() == null
+                            ? null
+                            : node.getParent().getId());
+
+            map.put(dto.getId(), dto);
+
+        }
+
+        List<CapabilityTreeDto> roots = new ArrayList<>();
+
+        for (CapabilityTreeDto dto : map.values()) {
+
+            if (dto.getParentId() == null) {
+
+                roots.add(dto);
+
+            } else {
+
+                CapabilityTreeDto parent = map.get(dto.getParentId());
+
+                if (parent != null) {
+
+                    parent.getChildren().add(dto);
+
+                }
+
+            }
+
+        }
+
+        return roots;
+
+    }
 }

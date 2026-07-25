@@ -9,14 +9,21 @@ import java.util.List;
 
 @Repository
 public interface ArtifactRelationshipRepository extends JpaRepository<ArtifactRelationship, Long> {
+
     List<ArtifactRelationship> findBySourceArtifactId(Long sourceArtifactId);
 
     List<ArtifactRelationship> findByTargetArtifactId(Long targetArtifactId);
 
-    List<ArtifactRelationship> findBySourceArtifactIdOrTargetArtifactId(Long sourceArtifactId, Long targetArtifactId);
+    List<ArtifactRelationship> findBySourceArtifactIdOrTargetArtifactId(
+            Long sourceArtifactId,
+            Long targetArtifactId);
 
     boolean existsBySourceArtifactIdAndTargetArtifactIdAndRelationshipType(
             Long sourceArtifactId,
             Long targetArtifactId,
             RelationshipType relationshipType);
+
+    List<ArtifactRelationship> findBySourceArtifactIdInOrTargetArtifactIdIn(
+            List<Long> sourceIds,
+            List<Long> targetIds);
 }

@@ -30,7 +30,7 @@ export const navigation = [
     {
         title: "Relationships",
         children: [
-            { title: "Enterprise Graph", icon: Hub, path: "/enterprise-graph" },
+            { title: "Enterprise Graph", icon: Hub, path: "/graph" },
             { title: "Dependency Tree", icon: DeviceHub },
         ],
     },

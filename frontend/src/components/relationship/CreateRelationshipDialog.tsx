@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 import {
     Dialog,
@@ -9,11 +9,16 @@ import {
     TextField,
     MenuItem,
     Stack,
+    Typography,
 } from "@mui/material";
 
 import { useArtifacts } from "../../hooks/useArtifacts";
+import { useCapabilityNodes } from "../../hooks/useCapabilityNodes";
+import { capabilityNodeService } from "../../services/capabilityNodeService";
 
 import { relationshipService } from "../../services/relationshipService";
+
+import type { CapabilityNode } from "../../types/capabilityNode";
 
 const relationshipTypes = [
 
@@ -82,12 +87,76 @@ export default function CreateRelationshipDialog({
 }: Props) {
 
     const { artifacts } = useArtifacts();
+    const { nodes: capabilityNodes } = useCapabilityNodes();
 
     const [targetArtifactId, setTargetArtifactId] = useState<number>();
 
     const [relationshipType, setRelationshipType] = useState("");
 
     const [description, setDescription] = useState("");
+
+    const [lastLevelChildren, setLastLevelChildren] = useState<CapabilityNode[]>([]);
+
+    const [loadingChildren, setLoadingChildren] = useState(false);
+
+    // Find the last level children (artifacts) when source is a capability
+    useEffect(() => {
+        const findLastLevelChildren = async () => {
+            if (!open) return;
+
+            const sourceArtifact = artifacts.find(a => a.id === sourceArtifactId);
+            if (!sourceArtifact || sourceArtifact.artifactType !== "CAPABILITY") {
+                setLastLevelChildren([]);
+                return;
+            }
+
+            setLoadingChildren(true);
+            try {
+                // Find the capability node matching the source artifact
+                const matchingNode = capabilityNodes.find(node => node.code === sourceArtifact.code);
+                if (!matchingNode) {
+                    setLastLevelChildren([]);
+                    return;
+                }
+
+                // Recursively find all last-level children (those with no children)
+                const findDeepestChildren = async (nodeId: number): Promise<CapabilityNode[]> => {
+                    const children = await capabilityNodeService.getChildren(nodeId);
+                    if (children.length === 0) {
+                        // This is a last-level node (artifact)
+                        const nodeDetails = await capabilityNodeService.getById(nodeId);
+                        return [nodeDetails];
+                    }
+
+                    // Recursively find deepest children
+                    const allDeepest: CapabilityNode[] = [];
+                    for (const child of children) {
+                        const deepest = await findDeepestChildren(child.id);
+                        allDeepest.push(...deepest);
+                    }
+                    return allDeepest;
+                };
+
+                const deepestChildren = await findDeepestChildren(matchingNode.id);
+                setLastLevelChildren(deepestChildren);
+
+                // Auto-select the first last-level child if available
+                if (deepestChildren.length > 0) {
+                    const firstChildArtifact = artifacts.find(a => a.code === deepestChildren[0].code);
+                    if (firstChildArtifact) {
+                        setTargetArtifactId(firstChildArtifact.id);
+                    }
+                }
+            } catch (error) {
+                console.error("Error finding last-level children:", error);
+                setLastLevelChildren([]);
+            } finally {
+                setLoadingChildren(false);
+            }
+        };
+
+        findLastLevelChildren();
+    }, [open, sourceArtifactId, artifacts, capabilityNodes]);
 
     const handleSave = async () => {
 
@@ -111,6 +180,31 @@ export default function CreateRelationshipDialog({
 
     };
 
+    // Get source artifact to check if it's a capability
+    const sourceArtifact = artifacts.find(a => a.id === sourceArtifactId);
+    const isSourceCapability = sourceArtifact?.artifactType === "CAPABILITY";
+
+    // Filter artifacts based on whether source is capability
+    const getFilteredArtifacts = () => {
+        const allFiltered = artifacts.filter(a => a.id !== sourceArtifactId);
+        
+        if (isSourceCapability && lastLevelChildren.length > 0) {
+            // Prioritize last-level children (artifacts)
+            const lastLevelArtifacts = allFiltered.filter(a => 
+                lastLevelChildren.some(child => child.code === a.code)
+            );
+            
+            // Put last-level artifacts first, then others
+            return [...lastLevelArtifacts, ...allFiltered.filter(a => 
+                !lastLevelChildren.some(child => child.code === a.code)
+            )];
+        }
+        
+        return allFiltered;
+    };
+
+    const filteredArtifacts = getFilteredArtifacts();
+
     return (
 
         <Dialog
@@ -129,6 +223,15 @@ export default function CreateRelationshipDialog({
 
                 <Stack spacing={3} sx={{ mt: 1 }}>
 
+                    {isSourceCapability && (
+                        <Typography variant="caption" color="text.secondary">
+                            {loadingChildren ? "Loading last-level capabilities..." : 
+                             lastLevelChildren.length > 0 
+                                ? `Relations connect to last-level capabilities (artifacts). Found ${lastLevelChildren.length} artifact(s).`
+                                : "No last-level capabilities found for this capability."}
+                        </Typography>
+                    )}
+
                     <TextField
                         select
                         label="Target Artifact"
@@ -137,22 +240,25 @@ export default function CreateRelationshipDialog({
                             setTargetArtifactId(Number(e.target.value))
                         }
                         fullWidth
+                        disabled={loadingChildren}
                     >
 
-                        {artifacts
-                            .filter(a => a.id !== sourceArtifactId)
-                            .map(a => (
-
+                        {filteredArtifacts.map(a => {
+                            const isLastLevel = lastLevelChildren.some(child => child.code === a.code);
+                            return (
                                 <MenuItem
                                     key={a.id}
                                     value={a.id}
+                                    sx={{
+                                        bgcolor: isLastLevel ? "rgba(76, 175, 80, 0.08)" : "inherit",
+                                        fontWeight: isLastLevel ? 600 : 400,
+                                    }}
                                 >
-
                                     {a.code} - {a.name} ({a.artifactType})
-
+                                    {isLastLevel && " ★"}
                                 </MenuItem>
-
-                            ))}
+                            );
+                        })}
 
                     </TextField>
 
@@ -206,6 +312,7 @@ export default function CreateRelationshipDialog({
                 <Button
                     variant="contained"
                     onClick={handleSave}
+                    disabled={loadingChildren}
                 >
                     Create
                 </Button>

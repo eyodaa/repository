@@ -1,5 +1,6 @@
 package com.enterprise.dashen_repository.capability_node.node_controller;
 
+import com.enterprise.dashen_repository.capability_node.dto.CapabilityTreeDto;
 import com.enterprise.dashen_repository.capability_node.node_entity.CapabilityNode;
 import com.enterprise.dashen_repository.capability_node.node_service.CapabilityNodeService;
 
@@ -9,8 +10,8 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/nodes")
-@CrossOrigin
+@RequestMapping("/api/nodes")
+@CrossOrigin(origins = "*")
 public class CapabilityNodeController {
 
     private final CapabilityNodeService service;
@@ -63,4 +64,8 @@ public class CapabilityNodeController {
         service.delete(id);
     }
 
+    @GetMapping("/tree")
+    public List<CapabilityTreeDto> getTree() {
+        return service.getTree();
+    }
 }
