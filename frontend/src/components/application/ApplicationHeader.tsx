@@ -57,7 +57,7 @@ export default function ApplicationHeader({ application }: ApplicationHeaderProp
                     rowGap: 2,
                 }}
             >
-                <Typography color="text.secondary">Owner</Typography>
+                <Typography color="text.secondary">Technical Owner</Typography>
                 <Typography>{application.technicalOwner}</Typography>
 
                 <Typography color="text.secondary">Business Unit</Typography>

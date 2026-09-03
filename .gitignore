@@ -1,0 +1,40 @@
+# Environment and secrets
+.env
+.env.*
+!.env.example
+
+# Java / Maven
+target/
+*.class
+
+# IDE
+.idea/
+.vscode/
+*.iml
+.classpath
+.project
+.settings/
+
+# Node / React
+node_modules/
+frontend/node_modules/
+
+# Build files
+dist/
+frontend/dist/
+.vite/
+
+# Logs
+*.log
+
+# Database backups
+*.sql
+*.dump
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Temporary files
+*.tmp
+*.temp

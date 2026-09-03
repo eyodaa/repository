@@ -23,49 +23,27 @@ interface Props {
     onCreated: () => void;
 
 }
-
 const emptyTechnology: Technology = {
-
     id: 0,
-
     code: "",
-
     name: "",
-
     description: "",
-
     artifactType: "TECHNOLOGY",
-
     technologyType: "",
-
     vendor: "",
-
     productName: "",
-
     version: "",
-
     deploymentModel: "",
-
     platform: "",
-
     licenseType: "",
-
     lifecycleStatus: "ACTIVE",
-
     supportStatus: "",
-
     endOfSupportDate: "",
-
     endOfLifeDate: "",
-
     owner: "",
-
     supportGroup: "",
-
     website: "",
-
     documentation: "",
-
 };
 
 export default function CreateTechnologyDialog({

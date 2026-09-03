@@ -15,13 +15,9 @@ import {
 import { applicationService } from "../../services/applicationService";
 
 interface Props {
-
     open: boolean;
-
     onClose: () => void;
-
     onCreated: () => void;
-
 }
 
 const criticalities = [
@@ -37,13 +33,9 @@ const lifecycleStatuses = [
 ];
 
 export default function CreateApplicationDialog({
-
     open,
-
     onClose,
-
     onCreated,
-
 }: Props) {
 
     const [formData, setFormData] = useState({
@@ -57,6 +49,8 @@ export default function CreateApplicationDialog({
         vendor: "",
 
         version: "",
+
+        department: "",
 
         businessCriticality: "MEDIUM",
 
@@ -80,7 +74,9 @@ export default function CreateApplicationDialog({
 
     async function handleCreate() {
 
-        if (!formData.code || !formData.name) return;
+        if (!formData.code || !formData.name) {
+            return;
+        }
 
         setSaving(true);
 
@@ -110,6 +106,8 @@ export default function CreateApplicationDialog({
 
                 version: "",
 
+                department: "",
+
                 businessCriticality: "MEDIUM",
 
                 lifecycleStatus: "ACTIVE",
@@ -134,9 +132,7 @@ export default function CreateApplicationDialog({
         >
 
             <DialogTitle>
-
                 Create Application
-
             </DialogTitle>
 
             <DialogContent>
@@ -145,14 +141,22 @@ export default function CreateApplicationDialog({
 
                     <Grid container spacing={2}>
 
+                        {/* ========================= */}
+                        {/* IDENTIFICATION */}
+                        {/* ========================= */}
+
                         <Grid size={{ xs: 12, md: 6 }}>
 
                             <TextField
                                 label="Code"
                                 fullWidth
+                                required
                                 value={formData.code}
                                 onChange={(e) =>
-                                    change("code", e.target.value)
+                                    change(
+                                        "code",
+                                        e.target.value
+                                    )
                                 }
                             />
 
@@ -163,13 +167,21 @@ export default function CreateApplicationDialog({
                             <TextField
                                 label="Application Name"
                                 fullWidth
+                                required
                                 value={formData.name}
                                 onChange={(e) =>
-                                    change("name", e.target.value)
+                                    change(
+                                        "name",
+                                        e.target.value
+                                    )
                                 }
                             />
 
                         </Grid>
+
+                        {/* ========================= */}
+                        {/* DESCRIPTION */}
+                        {/* ========================= */}
 
                         <Grid size={12}>
 
@@ -180,11 +192,18 @@ export default function CreateApplicationDialog({
                                 rows={3}
                                 value={formData.description}
                                 onChange={(e) =>
-                                    change("description", e.target.value)
+                                    change(
+                                        "description",
+                                        e.target.value
+                                    )
                                 }
                             />
 
                         </Grid>
+
+                        {/* ========================= */}
+                        {/* APPLICATION INFORMATION */}
+                        {/* ========================= */}
 
                         <Grid size={{ xs: 12, md: 6 }}>
 
@@ -193,7 +212,10 @@ export default function CreateApplicationDialog({
                                 fullWidth
                                 value={formData.vendor}
                                 onChange={(e) =>
-                                    change("vendor", e.target.value)
+                                    change(
+                                        "vendor",
+                                        e.target.value
+                                    )
                                 }
                             />
 
@@ -206,7 +228,30 @@ export default function CreateApplicationDialog({
                                 fullWidth
                                 value={formData.version}
                                 onChange={(e) =>
-                                    change("version", e.target.value)
+                                    change(
+                                        "version",
+                                        e.target.value
+                                    )
+                                }
+                            />
+
+                        </Grid>
+
+                        {/* ========================= */}
+                        {/* BUSINESS INFORMATION */}
+                        {/* ========================= */}
+
+                        <Grid size={{ xs: 12, md: 6 }}>
+
+                            <TextField
+                                label="Department"
+                                fullWidth
+                                value={formData.department}
+                                onChange={(e) =>
+                                    change(
+                                        "department",
+                                        e.target.value
+                                    )
                                 }
                             />
 
@@ -218,7 +263,9 @@ export default function CreateApplicationDialog({
                                 select
                                 label="Business Criticality"
                                 fullWidth
-                                value={formData.businessCriticality}
+                                value={
+                                    formData.businessCriticality
+                                }
                                 onChange={(e) =>
                                     change(
                                         "businessCriticality",
@@ -244,13 +291,19 @@ export default function CreateApplicationDialog({
 
                         </Grid>
 
+                        {/* ========================= */}
+                        {/* LIFECYCLE */}
+                        {/* ========================= */}
+
                         <Grid size={{ xs: 12, md: 6 }}>
 
                             <TextField
                                 select
                                 label="Lifecycle Status"
                                 fullWidth
-                                value={formData.lifecycleStatus}
+                                value={
+                                    formData.lifecycleStatus
+                                }
                                 onChange={(e) =>
                                     change(
                                         "lifecycleStatus",
@@ -286,6 +339,7 @@ export default function CreateApplicationDialog({
 
                 <Button
                     onClick={onClose}
+                    disabled={saving}
                 >
                     Cancel
                 </Button>
@@ -293,9 +347,13 @@ export default function CreateApplicationDialog({
                 <Button
                     variant="contained"
                     onClick={handleCreate}
-                    disabled={saving}
+                    disabled={
+                        saving ||
+                        !formData.code ||
+                        !formData.name
+                    }
                 >
-                    Create
+                    {saving ? "Creating..." : "Create"}
                 </Button>
 
             </DialogActions>
@@ -303,5 +361,4 @@ export default function CreateApplicationDialog({
         </Dialog>
 
     );
-
 }

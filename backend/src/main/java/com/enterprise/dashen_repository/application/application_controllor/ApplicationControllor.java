@@ -3,7 +3,7 @@ package com.enterprise.dashen_repository.application.application_controllor;
 import com.enterprise.dashen_repository.application.application_entity.Application;
 import com.enterprise.dashen_repository.application.application_service.ApplicationService;
 import org.springframework.web.bind.annotation.*;
-
+import java.math.BigDecimal;
 import java.util.List;
 
 @RestController
@@ -41,5 +41,10 @@ public class ApplicationControllor {
     @DeleteMapping("/{id}")
     public void delete(@PathVariable Long id) {
         service.delete(id);
+    }
+
+    @GetMapping("/total-cost")
+    public BigDecimal getTotalApplicationCost() {
+        return service.getTotalApplicationCost();
     }
 }

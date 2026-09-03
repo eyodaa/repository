@@ -254,7 +254,52 @@ export default function ApplicationDetailsPage() {
                     borderColor: "divider",
                 }}
             >
+                <Paper
+                    elevation={0}
+                    sx={{
+                        mt: 4,
+                        p: 4,
+                        borderRadius: 3,
+                        border: "1px solid",
+                        borderColor: "divider",
+                        display: "flex",
+                        justifyContent: "space-between",
+                        alignItems: "center",
+                    }}
+                >
 
+                    <Box>
+
+                        <Typography variant="h6">
+
+                            TCO costs
+
+                        </Typography>
+
+                        <Typography
+                            variant="body2"
+                            color="text.secondary"
+                            sx={{ mt: 1 }}
+                        >
+
+                            Manage yearly Total Cost of Ownership assessments for this application.
+
+                        </Typography>
+
+                    </Box>
+
+                    <Button
+                        variant="contained"
+                        onClick={() =>
+                            navigate(`/applications/${application.id}/tco`)
+                        }
+                    >
+
+                        Open TCO Assessment
+
+                    </Button>
+
+                </Paper>
                 <Box>
 
                     <Typography variant="h6">
@@ -276,6 +321,14 @@ export default function ApplicationDetailsPage() {
                     </Typography>
 
                 </Box>
+                <Button
+                    variant="contained"
+                    onClick={() =>
+                        navigate(`/impact/${application.id}`)
+                    }
+                >
+                    Impact Analysis
+                </Button>
 
                 <Button
                     variant="contained"

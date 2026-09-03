@@ -66,7 +66,7 @@ export default function CapabilityExplorer() {
 
                 getItemChildren={(item) => item.children}
 
-                onItemClick={(event, id) => {
+                onItemClick={(_event, id) => {
 
                     navigate(`/capabilities/${id}`);
 

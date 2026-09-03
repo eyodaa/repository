@@ -59,7 +59,7 @@ export default function CapabilityDetailsPage() {
     const [selectedLeafRelationships, setSelectedLeafRelationships] =
         useState<RelationshipResponse[]>([]);
 
-    const [loadingSelectedRelationships, setLoadingSelectedRelationships] =
+    const [, setLoadingSelectedRelationships] =
         useState(false);
 
     const [loading, setLoading] =
@@ -215,8 +215,8 @@ export default function CapabilityDetailsPage() {
     // Handle node click in graph
     const handleNodeClick = (clickedNode: CapabilityNode) => {
         const isRoot = clickedNode.id === node?.id;
-        const isLeaf = isRoot 
-            ? hierarchyTree.length === 0 
+        const isLeaf = isRoot
+            ? hierarchyTree.length === 0
             : (clickedNode.level === 3 || !hasChildren(clickedNode.id, hierarchyTree));
 
         if (isLeaf) {

@@ -87,7 +87,7 @@ export default function CreateRelationshipDialog({
 }: Props) {
 
     const { artifacts } = useArtifacts();
-    const { nodes: capabilityNodes } = useCapabilityNodes();
+    const { nodes: capabilityNodes } = useCapabilityNodes() as { nodes: any[] };
 
     const [targetArtifactId, setTargetArtifactId] = useState<number>();
 

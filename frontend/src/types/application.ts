@@ -49,5 +49,6 @@ export interface Application {
     goLiveDate: string;
 
     retirementDate: string;
+    department?: string;
 
 }

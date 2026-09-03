@@ -8,13 +8,16 @@ import com.enterprise.dashen_repository.graph.graph_dto.GraphResponse;
 import com.enterprise.dashen_repository.graph.graph_dto.NeighborDto;
 import com.enterprise.dashen_repository.graph.graph_dto.NeighborResponse;
 import com.enterprise.dashen_repository.graph.graph_dto.TreeNode;
+import com.enterprise.dashen_repository.graph.graph_dto.TraversalNode;
 import com.enterprise.dashen_repository.relationship.relation_entity.ArtifactRelationship;
 import com.enterprise.dashen_repository.relationship.relation_repository.ArtifactRelationshipRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Queue;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -53,6 +56,38 @@ public class GraphService {
                                 artifact.getId(),
                                 artifact.getName(),
                                 artifact.getArtifactType().name());
+        }
+
+        private GraphNode mapImpactNode(
+                        Artifact artifact,
+                        int level,
+                        boolean root,
+                        int dependencyCount) {
+
+                return new GraphNode(
+                                artifact.getId(),
+                                artifact.getName(),
+                                artifact.getArtifactType().name(),
+                                level,
+                                root,
+                                calculateImpactLevel(level),
+                                dependencyCount);
+        }
+
+        private String calculateImpactLevel(int level) {
+
+                switch (level) {
+                        case 0:
+                                return "ROOT";
+                        case 1:
+                                return "CRITICAL";
+                        case 2:
+                                return "HIGH";
+                        case 3:
+                                return "MEDIUM";
+                        default:
+                                return "LOW";
+                }
         }
 
         private GraphEdge mapEdge(ArtifactRelationship relationship) {
@@ -97,10 +132,7 @@ public class GraphService {
                                         "INCOMING"));
                 }
 
-                GraphNode center = new GraphNode(
-                                artifact.getId(),
-                                artifact.getName(),
-                                artifact.getArtifactType().name());
+                GraphNode center = mapNode(artifact);
 
                 return new NeighborResponse(center, neighbors);
         }
@@ -125,8 +157,7 @@ public class GraphService {
 
                         Artifact child = relationship.getTargetArtifact();
 
-                        node.getChildren().add(
-                                        buildTree(child, visited));
+                        node.getChildren().add(buildTree(child, visited));
                 }
 
                 return node;
@@ -140,6 +171,90 @@ public class GraphService {
                 return buildTree(root, new HashSet<>());
         }
 
+        public GraphResponse getImpactGraph(Long artifactId) {
+
+                Artifact root = artifactRepository.findById(artifactId)
+                                .orElseThrow(() -> new RuntimeException("Artifact not found"));
+
+                List<GraphNode> nodes = new ArrayList<>();
+                List<GraphEdge> edges = new ArrayList<>();
+
+                Queue<TraversalNode> queue = new LinkedList<>();
+                Set<Long> visited = new HashSet<>();
+                Set<Long> edgeVisited = new HashSet<>();
+
+                queue.add(new TraversalNode(root.getId(), 0));
+
+                visited.add(root.getId());
+
+                int rootDependencyCount = relationshipRepository
+                                .findConnectedRelationships(root.getId())
+                                .size();
+
+                nodes.add(
+                                mapImpactNode(
+                                                root,
+                                                0,
+                                                true,
+                                                rootDependencyCount));
+
+                while (!queue.isEmpty()) {
+
+                        TraversalNode current = queue.poll();
+
+                        List<ArtifactRelationship> relationships = relationshipRepository.findConnectedRelationships(
+                                        current.getId());
+
+                        for (ArtifactRelationship relationship : relationships) {
+
+                                Artifact neighbor;
+
+                                if (relationship.getSourceArtifact().getId()
+                                                .equals(current.getId())) {
+
+                                        neighbor = relationship.getTargetArtifact();
+
+                                } else {
+
+                                        neighbor = relationship.getSourceArtifact();
+                                }
+
+                                if (!edgeVisited.contains(relationship.getId())) {
+
+                                        edges.add(mapEdge(relationship));
+                                        edgeVisited.add(relationship.getId());
+                                }
+
+                                if (visited.contains(neighbor.getId())) {
+                                        continue;
+                                }
+
+                                visited.add(neighbor.getId());
+
+                                int dependencyCount = relationshipRepository
+                                                .findConnectedRelationships(neighbor.getId())
+                                                .size();
+
+                                nodes.add(
+                                                mapImpactNode(
+                                                                neighbor,
+                                                                current.getLevel() + 1,
+                                                                false,
+                                                                dependencyCount));
+
+                                queue.add(
+                                                new TraversalNode(
+                                                                neighbor.getId(),
+                                                                current.getLevel() + 1));
+                        }
+                }
+
+                return new GraphResponse(nodes, edges);
+        }
+
+        /**
+         * Multi-level Impact Analysis (Breadth-First Search)
+         */
         public GraphResponse getArtifactGraph(Long artifactId) {
 
                 Artifact center = artifactRepository.findById(artifactId)
@@ -164,17 +279,13 @@ public class GraphService {
                         Artifact target = relationship.getTargetArtifact();
 
                         if (!visited.contains(source.getId())) {
-
                                 nodes.add(mapNode(source));
                                 visited.add(source.getId());
-
                         }
 
                         if (!visited.contains(target.getId())) {
-
                                 nodes.add(mapNode(target));
                                 visited.add(target.getId());
-
                         }
 
                         edges.add(mapEdge(relationship));
@@ -182,5 +293,4 @@ public class GraphService {
 
                 return new GraphResponse(nodes, edges);
         }
-
 }

@@ -1,104 +1,414 @@
 import ELK from "elkjs/lib/elk.bundled";
-import type { Node, Edge } from "@xyflow/react";
+import { Position, type Node, type Edge } from "@xyflow/react";
+
+import { buildHierarchy } from "./graphHierarchy";
+import { getRelationshipRule } from "./relationshipRules";
 
 const elk = new ELK();
 
 const NODE_WIDTH = 240;
 const NODE_HEIGHT = 100;
 
-function getLayerIndex(type: string = ""): number {
-    switch (type.toUpperCase()) {
-        case "CAPABILITY":
-            return 0;
-        case "PROCESS":
-            return 1;
-        case "APPLICATION":
-            return 2;
-        case "TECHNOLOGY":
-            return 3;
-        case "DATABASE":
-            return 4;
-        case "SERVER":
-            return 5;
-        default:
-            return 10;
-    }
-}
+export async function layoutGraph(
+    nodes: Node[],
+    edges: Edge[],
+    rootId?: number
+) {
 
-export async function layoutGraph(nodes: Node[], edges: Edge[]) {
-    const graph = {
-        id: "enterprise-architecture",
-        layoutOptions: {
-            "elk.algorithm": "layered",
-            "elk.direction": "DOWN",
+    // -------------------------------------------------------
+    // Build hierarchy
+    // -------------------------------------------------------
 
-            // Spacing & Alignment
-            "elk.layered.spacing.nodeNodeBetweenLayers": "100",
-            "elk.spacing.nodeNode": "80",
-            "elk.padding": "[top=60,left=60,bottom=60,right=60]",
+    const hierarchy = buildHierarchy(
 
-            // Enforce strict top-down layer positioning based on layer choices
-            "elk.layered.layering.strategy": "INTERACTIVE",
-            "elk.layered.nodePlacement.strategy": "NETWORK_SIMPLEX",
-            "elk.layered.crossingMinimization.strategy": "LAYER_SWEEP",
+        nodes.map(node => ({
+            id: Number(node.id),
 
-            // Port & Edge Routing (Forces top-to-bottom entry/exit)
-            "elk.edgeRouting": "ORTHOGONAL",
-            "elk.portConstraints": "FIXED_SIDE",
-            "elk.layered.unnecessaryBendpoints": "true",
-        },
+            label: String(
+                (node.data as any)?.label ?? ""
+            ),
 
-        children: nodes.map((node) => {
-            const layerIdx = getLayerIndex((node.data as any)?.type);
+            type: String(
+                (node.data as any)?.type ?? ""
+            ),
+        })),
+
+        edges.map(edge => ({
+            id: Number(edge.id),
+
+            source: Number(edge.source),
+
+            target: Number(edge.target),
+
+            type: String(
+                (edge.data as any)?.relationshipType ?? ""
+            ),
+        })),
+
+        rootId
+    );
+
+    // -------------------------------------------------------
+    // Build ELK edges
+    // -------------------------------------------------------
+
+    const elkEdges = edges.map(edge => {
+
+        const relationshipType =
+            String(
+                (edge.data as any)?.relationshipType ?? ""
+            ).toUpperCase();
+
+        const rule =
+            getRelationshipRule(
+                relationshipType
+            );
+
+        /*
+         * Vertical relationships:
+         *
+         * Capability
+         *      ↓
+         * Process
+         *      ↓
+         * Application
+         *      ↓
+         * Technology
+         *
+         * These use:
+         *
+         * source = bottom
+         * target = top
+         */
+
+        if (
+            rule.direction === "DOWN"
+        ) {
 
             return {
-                id: node.id,
-                width: NODE_WIDTH,
-                height: NODE_HEIGHT,
-                layoutOptions: {
-                    // Tell ELK to force the node to its specific layer rank
-                    "elk.layered.layering.layerId": String(layerIdx),
-                },
-                // Define explicit entry/exit ports to force clean straight arrows
-                ports: [
-                    {
-                        id: `${node.id}-top`,
-                        properties: { "elk.port.side": "NORTH" },
-                    },
-                    {
-                        id: `${node.id}-bottom`,
-                        properties: { "elk.port.side": "SOUTH" },
-                    },
+
+                id: String(edge.id),
+
+                sources: [
+                    `${edge.source}-bottom-source`
                 ],
+
+                targets: [
+                    `${edge.target}-top-target`
+                ],
+
             };
-        }),
 
-        edges: edges.map((edge) => ({
-            id: edge.id,
-            sources: [`${edge.source}-bottom`],
-            targets: [`${edge.target}-top`],
-        })),
-    };
+        }
 
-    const layout = await elk.layout(graph);
+        /*
+         * RIGHT relationships:
+         *
+         * Application ─────> Application
+         *
+         * or same-layer relationships
+         * that should flow to the right.
+         */
 
-    const layoutedNodes = nodes.map((node) => {
-        const elkNode = layout.children?.find((n) => n.id === node.id);
+        if (
+            rule.direction === "RIGHT"
+        ) {
+
+            return {
+
+                id: String(edge.id),
+
+                sources: [
+                    `${edge.source}-right-source`
+                ],
+
+                targets: [
+                    `${edge.target}-left-target`
+                ],
+
+            };
+
+        }
+
+        /*
+         * LEFT relationships.
+         */
+
+        if (
+            rule.direction === "LEFT"
+        ) {
+
+            return {
+
+                id: String(edge.id),
+
+                sources: [
+                    `${edge.source}-left-source`
+                ],
+
+                targets: [
+                    `${edge.target}-right-target`
+                ],
+
+            };
+
+        }
+
+        /*
+         * SAME relationships.
+         *
+         * These don't participate in the hierarchy.
+         *
+         * We still connect them using the side handles
+         * so React Flow can display the relationship.
+         */
 
         return {
-            ...node,
-            // Target handles for React Flow (@xyflow/react)
-            targetPosition: "top" as const,
-            sourcePosition: "bottom" as const,
-            position: {
-                x: elkNode?.x ?? 0,
-                y: elkNode?.y ?? 0,
-            },
+
+            id: String(edge.id),
+
+            sources: [
+                `${edge.source}-right-source`
+            ],
+
+            targets: [
+                `${edge.target}-left-target`
+            ],
+
         };
+
     });
 
-    return {
-        nodes: layoutedNodes,
-        edges,
+    // -------------------------------------------------------
+    // Build ELK children
+    // -------------------------------------------------------
+
+    const children = nodes.map(node => {
+
+        const nodeId =
+            Number(node.id);
+
+        const level =
+            hierarchy.get(nodeId)?.level ?? 0;
+
+        return {
+
+            id: String(node.id),
+
+            width: NODE_WIDTH,
+
+            height: NODE_HEIGHT,
+
+            /*
+             * Keep the architectural layer.
+             *
+             * 0 = Capability
+             * 1 = Process
+             * 2 = Application
+             * 3 = Technology
+             */
+
+            layoutOptions: {
+
+                "elk.layered.layering.layerId":
+                    String(level),
+
+            },
+
+            ports: [
+
+                // ------------------------------------------------
+                // TOP
+                // ------------------------------------------------
+
+                {
+
+                    id: `${node.id}-top-target`,
+
+                    properties: {
+
+                        "elk.port.side":
+                            "NORTH",
+
+                    },
+
+                },
+
+                // ------------------------------------------------
+                // BOTTOM
+                // ------------------------------------------------
+
+                {
+
+                    id: `${node.id}-bottom-source`,
+
+                    properties: {
+
+                        "elk.port.side":
+                            "SOUTH",
+
+                    },
+
+                },
+
+                // ------------------------------------------------
+                // LEFT
+                // ------------------------------------------------
+
+                {
+
+                    id: `${node.id}-left-target`,
+
+                    properties: {
+
+                        "elk.port.side":
+                            "WEST",
+
+                    },
+
+                },
+
+                // ------------------------------------------------
+                // RIGHT
+                // ------------------------------------------------
+
+                {
+
+                    id: `${node.id}-right-source`,
+
+                    properties: {
+
+                        "elk.port.side":
+                            "EAST",
+
+                    },
+
+                },
+
+            ],
+
+        };
+
+    });
+
+    // -------------------------------------------------------
+    // ELK graph
+    // -------------------------------------------------------
+
+    const graph = {
+
+        id: "enterprise",
+
+        layoutOptions: {
+
+            "elk.algorithm":
+                "layered",
+
+            "elk.direction":
+                "DOWN",
+
+            "elk.spacing.nodeNode":
+                "80",
+
+            "elk.layered.spacing.nodeNodeBetweenLayers":
+                "150",
+
+            "elk.padding":
+                "[top=60,left=60,bottom=60,right=60]",
+
+            /*
+             * Orthogonal routing gives us clean
+             * enterprise-architecture style connectors.
+             */
+
+            "elk.edgeRouting":
+                "ORTHOGONAL",
+
+            /*
+             * Reduce edge crossings.
+             */
+
+            "elk.layered.crossingMinimization.strategy":
+                "LAYER_SWEEP",
+
+            /*
+             * Keep nodes distributed cleanly.
+             */
+
+            "elk.layered.nodePlacement.strategy":
+                "NETWORK_SIMPLEX",
+
+            /*
+             * Allow explicit ports.
+             */
+
+            "elk.portConstraints":
+                "FIXED_SIDE",
+
+            /*
+             * Consider port positions when routing.
+             */
+
+            "elk.layered.considerModelOrder":
+                "true",
+
+        },
+
+        children,
+
+        edges: elkEdges,
+
     };
+
+    // -------------------------------------------------------
+    // Run ELK
+    // -------------------------------------------------------
+
+    const result =
+        await elk.layout(graph);
+
+    // -------------------------------------------------------
+    // Apply ELK positions to React Flow nodes
+    // -------------------------------------------------------
+
+    const layoutedNodes =
+        nodes.map(node => {
+
+            const elkNode =
+                result.children?.find(
+                    child =>
+                        child.id === node.id
+                );
+
+            return {
+
+                ...node,
+
+                position: {
+
+                    x: elkNode?.x ?? 0,
+
+                    y: elkNode?.y ?? 0,
+
+                },
+
+                sourcePosition: Position.Bottom,
+                targetPosition: Position.Top,
+
+            };
+
+        });
+
+    // -------------------------------------------------------
+    // Return
+    // -------------------------------------------------------
+
+    return {
+
+        nodes: layoutedNodes,
+
+        edges,
+
+    };
+
 }

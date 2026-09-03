@@ -19,7 +19,7 @@ export function useAnalysis(applicationId: number) {
         try {
 
             const data =
-                await analysisService.get(applicationId);
+                await analysisService.getAnalysisByApplicationId(applicationId);
 
             setAnalysis(data);
 

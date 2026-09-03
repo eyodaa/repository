@@ -29,7 +29,7 @@ export default function ApplicationAnalysisTable({ applicationId }: ApplicationA
         async function loadAnalysis() {
             setLoading(true);
             try {
-                const data = await analysisService.get(applicationId);
+                const data = await analysisService.getAnalysisByApplicationId(applicationId);
                 setAnalysis(data);
                 setError("");
             } catch (err) {

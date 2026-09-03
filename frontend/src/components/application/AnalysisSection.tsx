@@ -15,6 +15,7 @@ import AnalyticsIcon from "@mui/icons-material/Analytics";
 import { useEffect, useState } from "react";
 
 import { applicationService } from "../../services/applicationService";
+import { tcoService } from "../../services/tcoService";
 
 import ApplicationCube from "./EnterpriseCube/ApplicationCube";
 
@@ -32,6 +33,8 @@ export default function AnalysisSection({
 
     const [analysis, setAnalysis] =
         useState<ApplicationAnalysisResponse | null>(null);
+    const [tcoAssessment, setTcoAssessment] =
+        useState<any | null>(null);
 
     const [loading, setLoading] =
         useState(false);
@@ -50,6 +53,15 @@ export default function AnalysisSection({
                 await applicationService.getAnalysis(applicationId);
 
             setAnalysis(response.data);
+
+            try {
+                const tcoResponse = await tcoService.getApplicationAssessments(applicationId);
+                if (tcoResponse.data && tcoResponse.data.length > 0) {
+                    setTcoAssessment(tcoResponse.data[0]);
+                }
+            } catch (tcoErr) {
+                console.error("Failed to fetch TCO for analysis", tcoErr);
+            }
 
         } catch (err) {
 
@@ -120,6 +132,25 @@ export default function AnalysisSection({
                 return "default";
         }
 
+    };
+
+    const getCategoryTotal = (tco: any, categoryId: string): number => {
+        if (!tco?.costItems || !Array.isArray(tco.costItems)) return 0;
+
+        return tco.costItems
+            .filter((item: any) => {
+                const category = item.category || item.costDefinition?.category;
+                return category?.toUpperCase() === categoryId.toUpperCase();
+            })
+            .reduce((total: number, item: any) => {
+                if (!item.yearlyAmounts || !Array.isArray(item.yearlyAmounts)) return total;
+
+                const itemSum = item.yearlyAmounts.reduce(
+                    (sum: number, ya: any) => sum + Number(ya.amount || 0),
+                    0
+                );
+                return total + itemSum;
+            }, 0);
     };
 
     return (
@@ -282,6 +313,55 @@ export default function AnalysisSection({
                         <Divider />
                     </Grid>
 
+                    {tcoAssessment && (
+                        <>
+                            <Grid size={{ xs: 12 }}>
+                                <Typography variant="h6" sx={{ mt: 1, mb: 1 }}>
+                                    TCO Costs Breakdown
+                                </Typography>
+                            </Grid>
+
+                            <Grid size={{ xs: 6, md: 4 }}>
+                                <Typography color="text.secondary">Licence Cost (External Software Costs )</Typography>
+                                <Typography >
+                                    ${getCategoryTotal(tcoAssessment, 'EXTERNAL').toLocaleString()}
+                                </Typography>
+                            </Grid>
+
+                            <Grid size={{ xs: 6, md: 4 }}>
+                                <Typography color="text.secondary">Maintenance Cost (Software Upgrade Costs)</Typography>
+                                <Typography>
+                                    ${getCategoryTotal(tcoAssessment, 'UPGRADE').toLocaleString()}
+                                </Typography>
+                            </Grid>
+
+                            <Grid size={{ xs: 6, md: 4 }}>
+                                <Typography color="text.secondary">Indirect Cost (Labour + Infrastructure Costs)</Typography>
+                                <Typography>
+                                    ${(getCategoryTotal(tcoAssessment, 'LABOUR') + getCategoryTotal(tcoAssessment, 'INFRASTRUCTURE')).toLocaleString()}
+                                </Typography>
+                            </Grid>
+
+                            <Grid size={{ xs: 6, md: 4 }}>
+                                <Typography color="text.secondary">Other Cost(Indirect Support Costs) </Typography>
+                                <Typography>
+                                    ${(getCategoryTotal(tcoAssessment, 'SUPPORT')).toLocaleString()}
+                                </Typography>
+                            </Grid>
+
+                            <Grid size={{ xs: 12, md: 4 }}>
+                                <Typography color="text.secondary">Total TCO Cost</Typography>
+                                <Typography color="primary">
+                                    ${(tcoAssessment.totalCost ?? 0).toLocaleString()}
+                                </Typography>
+                            </Grid>
+
+                            <Grid size={{ xs: 12 }}>
+                                <Divider sx={{ mt: 1 }} />
+                            </Grid>
+                        </>
+                    )}
+
                     <Grid size={{ xs: 12 }}>
                         <Typography color="text.secondary">
                             Identified Pattern
@@ -326,7 +406,7 @@ export default function AnalysisSection({
                             fontWeight: 700,
                         }}
                     >
-                        Digital Twin Visualization
+                        Visualization
                     </Typography>
 
                     <Box

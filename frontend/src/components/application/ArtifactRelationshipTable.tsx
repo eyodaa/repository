@@ -171,29 +171,28 @@ export default function ArtifactRelationshipTable({
             field: "relationship",
             headerName: "Relationship",
             width: 190,
-            sortable: false,
 
-            renderCell: (params) => {
-
-                const row = params.row;
+            valueGetter: (_, row) => {
 
                 const isSource =
                     row.sourceArtifact.id === artifactId;
 
-                const relationship = isSource
+                return isSource
                     ? row.relationshipType
                     : inverseRelationship[row.relationshipType] ??
                     row.relationshipType;
 
-                return (
-                    <Chip
-                        label={relationship.replaceAll("_", " ")}
-                        color="primary"
-                        size="small"
-                    />
-                );
-
             },
+
+            renderCell: (params) => (
+
+                <Chip
+                    label={String(params.value).replaceAll("_", " ")}
+                    color="primary"
+                    size="small"
+                />
+
+            ),
         },
 
         {

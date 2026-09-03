@@ -1,10 +1,16 @@
-import { useEffect, useState, useImperativeHandle, forwardRef, useCallback } from "react";
+import {
+    useEffect,
+    useState,
+    useRef,
+    useImperativeHandle,
+    forwardRef,
+    useCallback,
+} from "react";
 
 import {
     ReactFlow,
     Background,
     Controls,
-    MarkerType,
     BackgroundVariant,
     useNodesState,
     useEdgesState,
@@ -18,142 +24,280 @@ import type {
 import "@xyflow/react/dist/style.css";
 
 import EnterpriseNode from "./nodes/EnterpriseNode";
-import { graphService } from "../../services/graphService";
-import type { GraphResponse } from "../../types/graph";
 
+import { graphService } from "../../services/graphService";
+import { buildGraph } from "../../utils/graphBuilder";
 import { layoutGraph } from "../../utils/elkLayout";
+
+import type { GraphResponse } from "../../types/graph";
 
 interface EnterpriseGraphProps {
     artifactId?: number;
     height?: number | string;
     selectedTypes?: Set<string>;
+    selectedRelationships?: Set<string>;
 }
 
 export interface EnterpriseGraphRef {
-    fitView: () => void;
-    reLayout: () => void;
+
+    fitView(): void;
+
+    reLayout(): void;
+
+    exportPNG(): Promise<void>;
+
+    exportSVG(): Promise<void>;
+
+    exportJSON(): void;
+
+    exportXML(): void;
+
 }
 
 const nodeTypes = {
     enterprise: EnterpriseNode,
 };
 
-const NODE_WIDTH = 220;
-const NODE_HEIGHT = 90;
-
-const EnterpriseGraph = forwardRef<EnterpriseGraphRef, EnterpriseGraphProps>(({
+const EnterpriseGraph = forwardRef<
+    EnterpriseGraphRef,
+    EnterpriseGraphProps
+>(({
     artifactId,
     height = "100%",
     selectedTypes,
+    selectedRelationships,
 }, ref) => {
-    // 1. Use React Flow's built-in state hooks
-    const [nodes, setNodes, onNodesChange] = useNodesState<Node>([]);
-    const [edges, setEdges, onEdgesChange] = useEdgesState<Edge>([]);
-    const [loading, setLoading] = useState(true);
-    const [reactFlowInstance, setReactFlowInstance] = useState<any>(null);
+
+    const [nodes, setNodes, onNodesChange] =
+        useNodesState<Node>([]);
+
+    const [edges, setEdges, onEdgesChange] =
+        useEdgesState<Edge>([]);
+
+    const [loading, setLoading] =
+        useState(true);
+
+    const [reactFlowInstance, setReactFlowInstance] =
+        useState<any>(null);
+
+    const graphContainerRef =
+        useRef<HTMLDivElement>(null);
 
     const loadGraph = useCallback(async () => {
+
         try {
+
             setLoading(true);
 
             let graph: GraphResponse;
 
             if (artifactId) {
-                graph = await graphService.getArtifactGraph(artifactId);
+
+                graph =
+                    await graphService.getArtifactGraph(
+                        artifactId
+                    );
+
             } else {
-                graph = await graphService.getEnterpriseGraph();
+
+                graph =
+                    await graphService.getEnterpriseGraph();
+
             }
 
-            // Filter nodes based on selectedTypes
-            const filteredNodes = selectedTypes
-                ? graph.nodes.filter(node => selectedTypes.has(node.type.toUpperCase()))
-                : graph.nodes;
+            const builtGraph = buildGraph(graph, {
 
-            const flowNodes: Node[] = filteredNodes.map(node => ({
-                id: String(node.id),
-                type: "enterprise",
-                position: {
-                    x: 0,
-                    y: 0,
-                },
-                data: {
-                    label: node.label,
-                    type: node.type,
-                },
-                width: NODE_WIDTH,
-                height: NODE_HEIGHT,
-                connectable: node.type.toUpperCase() === "CAPABILITY",
-            }));
+                artifactId,
 
-            // Filter edges to only include edges between filtered nodes
-            const nodeIds = new Set(flowNodes.map(n => n.id));
-            const flowEdges: Edge[] = graph.edges
-                .filter(edge => 
-                    nodeIds.has(String(edge.source)) && nodeIds.has(String(edge.target))
-                )
-                .map(edge => ({
-                    id: String(edge.id),
-                    source: String(edge.source),
-                    target: String(edge.target),
-                    label: edge.type
-                        .replaceAll("_", " ")
-                        .toUpperCase(),
-                    type: "smoothstep",
-                    animated: false,
-                    markerEnd: {
-                        type: MarkerType.ArrowClosed,
-                        width: 18,
-                        height: 18,
-                    },
-                    style: {
-                        strokeWidth: 2,
-                        stroke: "#64748b",
-                    },
-                    labelStyle: {
-                        fill: "#ffffff",
-                        fontWeight: 600,
-                        fontSize: 11,
-                    },
-                    labelBgStyle: {
-                        fill: "#1e293b",
-                    },
-                    labelBgPadding: [6, 3],
-                    labelBgBorderRadius: 5,
-                }));
+                selectedTypes,
+
+                selectedRelationships,
+
+            });
 
             const layouted = await layoutGraph(
-                flowNodes,
-                flowEdges
+
+                builtGraph.nodes,
+
+                builtGraph.edges,
+                
+                artifactId
+
             );
 
-            // Cast type if ELK returns generic object instead of ReactFlow Node[] / Edge[]
             setNodes(layouted.nodes as Node[]);
+
             setEdges(layouted.edges as Edge[]);
 
-        } catch (err) {
-            console.error("Error loading graph layout:", err);
-        } finally {
-            setLoading(false);
         }
-    }, [artifactId, selectedTypes, setNodes, setEdges]);
+        catch (err) {
 
-    useImperativeHandle(ref, () => ({
-        fitView: () => {
-            if (reactFlowInstance) {
-                reactFlowInstance.fitView({ padding: 0.2, duration: 600 });
-            }
-        },
-        reLayout: () => {
-            loadGraph();
-        },
-    }));
+            console.error("Graph loading failed", err);
 
+        }
+        finally {
+
+            setLoading(false);
+
+        }
+
+    }, [
+
+        artifactId,
+
+        selectedTypes,
+
+        selectedRelationships,
+
+        setNodes,
+
+        setEdges,
+
+    ]);
+
+    useImperativeHandle(
+        ref,
+        () => ({
+
+            fitView() {
+
+                reactFlowInstance?.fitView({
+                    padding: 0.2,
+                    duration: 600,
+                });
+
+            },
+
+            reLayout() {
+
+                loadGraph();
+
+            },
+
+            async exportPNG() {
+
+                if (!graphContainerRef.current) return;
+
+                const element =
+                    graphContainerRef.current.querySelector(
+                        ".react-flow"
+                    ) as HTMLElement;
+
+                if (!element) return;
+
+                const {
+                    exportGraphAsPNG,
+                } = await import("../../utils/graphExport");
+
+                await exportGraphAsPNG(element);
+
+            },
+
+            async exportSVG() {
+
+                if (!graphContainerRef.current) return;
+
+                const element =
+                    graphContainerRef.current.querySelector(
+                        ".react-flow"
+                    ) as HTMLElement;
+
+                if (!element) return;
+
+                const {
+                    exportGraphAsSVG,
+                } = await import("../../utils/graphExport");
+
+                await exportGraphAsSVG(element);
+
+            },
+
+            exportJSON() {
+
+                import("../../utils/graphExport").then(utils => {
+
+                    utils.exportGraphAsJSON(
+                        nodes,
+                        edges
+                    );
+
+                });
+
+            },
+
+            exportXML() {
+
+                const xml = `<?xml version="1.0" encoding="UTF-8"?>
+<EnterpriseRepository>
+
+    <Nodes>
+${nodes.map(node => `
+        <Node
+            id="${node.id}"
+            type="${(node.data as any).type}"
+            label="${(node.data as any).label}"
+            x="${node.position.x}"
+            y="${node.position.y}"
+        />`).join("")}
+    </Nodes>
+
+    <Relationships>
+${edges.map(edge => `
+        <Relationship
+            id="${edge.id}"
+            source="${edge.source}"
+            target="${edge.target}"
+            type="${(edge.data as any)?.relationshipType ?? ""}"
+        />`).join("")}
+    </Relationships>
+
+</EnterpriseRepository>`;
+
+                const blob = new Blob(
+                    [xml],
+                    {
+                        type: "application/xml",
+                    }
+                );
+
+                const url =
+                    URL.createObjectURL(blob);
+
+                const link =
+                    document.createElement("a");
+
+                link.href = url;
+                link.download =
+                    "enterprise-repository.xml";
+
+                document.body.appendChild(link);
+
+                link.click();
+
+                document.body.removeChild(link);
+
+                URL.revokeObjectURL(url);
+
+            },
+
+        }),
+        [
+            reactFlowInstance,
+            loadGraph,
+            nodes,
+            edges,
+        ]
+    );
     useEffect(() => {
+
         loadGraph();
+
     }, [loadGraph]);
 
     if (loading) {
+
         return (
+
             <div
                 style={{
                     width: "100%",
@@ -167,54 +311,101 @@ const EnterpriseGraph = forwardRef<EnterpriseGraphRef, EnterpriseGraphProps>(({
             >
                 Loading Graph...
             </div>
+
         );
+
     }
 
     return (
+
         <div
+
+            ref={graphContainerRef}
+
             style={{
+
                 width: "100%",
+
                 height,
+
             }}
+
         >
+
             <ReactFlow
+
                 nodes={nodes}
+
                 edges={edges}
-                onNodesChange={onNodesChange}
-                onEdgesChange={onEdgesChange}
+
                 nodeTypes={nodeTypes}
+
+                onNodesChange={onNodesChange}
+
+                onEdgesChange={onEdgesChange}
+
                 fitView
+
                 fitViewOptions={{
+
                     padding: 0.2,
+
                     duration: 600,
+
                 }}
+
                 nodesDraggable
-                panOnDrag
-                panOnScroll
-                zoomOnScroll
-                zoomOnPinch
-                zoomOnDoubleClick={false}
+
                 nodesConnectable
+
                 elementsSelectable
+
+                panOnDrag
+
+                panOnScroll
+
+                zoomOnScroll
+
+                zoomOnPinch
+
+                zoomOnDoubleClick={false}
+
                 proOptions={{
+
                     hideAttribution: true,
+
                 }}
+
                 defaultEdgeOptions={{
+
                     animated: false,
+
                 }}
+
                 onInit={setReactFlowInstance}
+
             >
+
                 <Background
+
                     variant={BackgroundVariant.Dots}
+
                     gap={22}
+
                     size={1}
+
                 />
+
                 <Controls />
+
             </ReactFlow>
+
         </div>
+
     );
+
 });
 
-EnterpriseGraph.displayName = 'EnterpriseGraph';
+EnterpriseGraph.displayName = "EnterpriseGraph";
 
 export default EnterpriseGraph;

@@ -12,6 +12,9 @@ import TechnologyDetailsPage from "../pages/Technologies/TechnologyDetailsPage";
 import CapabilityDetailsPage from "../pages/Capabilities/CapabilityDetailsPage";
 import GraphPage from "../pages/Graph/GraphPage";
 import EnterpriseMapPage from "../pages/Graph/EnterpriseMapPage";
+import TCOAssessmentPage from "../pages/tco/TCOAssessmentPage";
+import BusinessProcessDetailsPage from "../pages/Processes/BusinessProcessDetailsPage";
+import ImpactAnalysisPage from "../pages/impact/ImpactAnalysisPage";
 export default function AppRouter() {
     return (
         <BrowserRouter>
@@ -25,13 +28,21 @@ export default function AppRouter() {
                     <Route path="/capabilities" element={<CapabilitiesPage />} />
                     <Route path="/capabilities/:id" element={<CapabilityDetailsPage />} />
                     <Route path="/processes" element={<ProcessesPage />} />
-
+                    <Route path="/processes/:id" element={<BusinessProcessDetailsPage />} />
                     <Route path="/graph/:id" element={<GraphPage />} />
                     <Route
                         path="/graph/:artifactType/:id"
                         element={<GraphPage />}
                     />
                     <Route path="/graph" element={<EnterpriseMapPage />} />
+                    <Route
+                        path="/applications/:id/tco"
+                        element={<TCOAssessmentPage />}
+                    />
+                    <Route
+                        path="/impact/:id"
+                        element={<ImpactAnalysisPage />}
+                    />
                 </Routes>
             </MainLayout>
         </BrowserRouter>

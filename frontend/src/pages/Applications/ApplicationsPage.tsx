@@ -10,8 +10,6 @@ import ApplicationImportDialog from "../../components/application/ApplicationImp
 export default function ApplicationsPage() {
 
     const [search, setSearch] = useState("");
-    const [status, setStatus] = useState("");
-    const [criticality, setCriticality] = useState("");
 
     const [openCreateDialog, setOpenCreateDialog] = useState(false);
     const [openImportDialog, setOpenImportDialog] = useState(false);
@@ -25,11 +23,7 @@ export default function ApplicationsPage() {
 
             <ApplicationToolbar
                 search={search}
-                status={status}
-                criticality={criticality}
                 onSearchChange={setSearch}
-                onStatusChange={setStatus}
-                onCriticalityChange={setCriticality}
                 onAdd={() => setOpenCreateDialog(true)}
                 onImport={() => setOpenImportDialog(true)}
             />
@@ -46,7 +40,9 @@ export default function ApplicationsPage() {
                         height: 650,
                     }}
                 >
-                    <ApplicationTable />
+                    <ApplicationTable
+                        search={search}
+                    />
                 </Paper>
             </Box>
 

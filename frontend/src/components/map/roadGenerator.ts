@@ -24,8 +24,6 @@ export function generateRoads(
 
             depth: 4,
 
-            highlighted: false,
-
         });
 
     }

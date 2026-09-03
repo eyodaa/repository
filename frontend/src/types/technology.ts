@@ -1,46 +1,51 @@
-import { useEffect, useState } from "react";
-import { technologyService } from "../services/technologyService";
+export interface Technology {
+    // ==========================
+    // COMMON ARTIFACT FIELDS
+    // ==========================
 
-export function useTechnologies() {
+    id: number;
+    code: string;
+    name: string;
+    description: string;
+    artifactType: string;
 
-    const [technologies, setTechnologies] = useState<any[]>([]);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState("");
+    // ==========================
+    // CLASSIFICATION
+    // ==========================
 
-    async function loadTechnologies() {
+    technologyType: string;
+    vendor: string;
+    productName: string;
+    version: string;
 
-        setLoading(true);
+    // ==========================
+    // DEPLOYMENT
+    // ==========================
 
-        try {
+    deploymentModel: string;
+    platform: string;
+    licenseType: string;
 
-            const data = await technologyService.getAll();
+    // ==========================
+    // LIFECYCLE
+    // ==========================
 
-            setTechnologies(data);
-            setError("");
+    lifecycleStatus: string;
+    supportStatus: string;
+    endOfSupportDate: string;
+    endOfLifeDate: string;
 
-        } catch {
+    // ==========================
+    // GOVERNANCE
+    // ==========================
 
-            setError("Unable to load technologies.");
+    owner: string;
+    supportGroup: string;
 
-        } finally {
+    // ==========================
+    // REFERENCES
+    // ==========================
 
-            setLoading(false);
-
-        }
-
-    }
-
-    useEffect(() => {
-        loadTechnologies();
-    }, []);
-
-    return {
-
-        technologies,
-        loading,
-        error,
-        refresh: loadTechnologies,
-
-    };
-
+    website: string;
+    documentation: string;
 }

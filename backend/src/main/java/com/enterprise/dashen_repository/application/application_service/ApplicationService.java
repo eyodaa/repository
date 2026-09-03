@@ -3,16 +3,23 @@ package com.enterprise.dashen_repository.application.application_service;
 import com.enterprise.dashen_repository.application.application_entity.Application;
 import com.enterprise.dashen_repository.application.application_repository.ApplicationRepository;
 import org.springframework.stereotype.Service;
-
+import com.enterprise.dashen_repository.application.tco.repository.TCOSummaryRepository;
 import java.util.List;
+
+import java.math.BigDecimal;
 
 @Service
 public class ApplicationService {
 
     private final ApplicationRepository repository;
+    private final TCOSummaryRepository summaryRepository;
 
-    public ApplicationService(ApplicationRepository repository) {
+    public ApplicationService(
+            ApplicationRepository repository,
+            TCOSummaryRepository summaryRepository) {
+
         this.repository = repository;
+        this.summaryRepository = summaryRepository;
     }
 
     public List<Application> findAll() {
@@ -45,7 +52,7 @@ public class ApplicationService {
         existing.setBusinessOwner(application.getBusinessOwner());
         existing.setTechnicalOwner(application.getTechnicalOwner());
         existing.setBusinessCriticality(application.getBusinessCriticality());
-
+        existing.setDepartment(application.getDepartment());
         // Application Information
         existing.setVendor(application.getVendor());
         existing.setVersion(application.getVersion());
@@ -77,5 +84,9 @@ public class ApplicationService {
 
     public void delete(Long id) {
         repository.deleteById(id);
+    }
+
+    public BigDecimal getTotalApplicationCost() {
+        return summaryRepository.getTotalApplicationCost();
     }
 }
