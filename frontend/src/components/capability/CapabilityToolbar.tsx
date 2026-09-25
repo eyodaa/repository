@@ -7,7 +7,13 @@ import {
 
 import AddIcon from "@mui/icons-material/Add";
 
-export default function CapabilityToolbar() {
+import CalculateIcon from "@mui/icons-material/Calculate";
+
+interface Props {
+    onCalculateMaturity?: () => void;
+}
+
+export default function CapabilityToolbar({ onCalculateMaturity }: Props) {
 
     return (
 
@@ -27,6 +33,15 @@ export default function CapabilityToolbar() {
             />
 
             <Box sx={{ flexGrow: 1 }} />
+
+            <Button
+                variant="outlined"
+                color="secondary"
+                startIcon={<CalculateIcon />}
+                onClick={onCalculateMaturity}
+            >
+                Calculate Maturity
+            </Button>
 
             <Button
                 variant="contained"

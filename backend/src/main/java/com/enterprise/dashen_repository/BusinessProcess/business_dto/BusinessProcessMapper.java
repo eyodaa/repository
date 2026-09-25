@@ -1,8 +1,6 @@
 package com.enterprise.dashen_repository.BusinessProcess.business_dto;
 
 import com.enterprise.dashen_repository.BusinessProcess.business_process_entity.BusinessProcess;
-import com.enterprise.dashen_repository.BusinessProcess.business_dto.BusinessProcessResponse;
-import com.enterprise.dashen_repository.BusinessProcess.business_dto.ChildProcessResponse;
 import org.springframework.stereotype.Component;
 
 import java.util.List;

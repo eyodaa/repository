@@ -8,6 +8,8 @@ import {
 import { useNavigate } from "react-router-dom";
 
 import { useCapabilityNodes } from "../../hooks/useCapabilityNodes";
+import { capabilityNodeService } from "../../services/capabilityNodeService";
+import CapabilityToolbar from "./CapabilityToolbar";
 
 const columns: GridColDef[] = [
 
@@ -73,6 +75,7 @@ export default function CapabilityTable() {
         nodes,
         loading,
         error,
+        refresh,
     } = useCapabilityNodes();
 
     function handleRowClick(params: GridRowParams) {
@@ -108,9 +111,20 @@ export default function CapabilityTable() {
 
     }
 
+    async function handleCalculateMaturity() {
+        try {
+            await capabilityNodeService.calculateMaturity();
+            refresh();
+        } catch (err) {
+            console.error(err);
+        }
+    }
+
     return (
 
-        <Box sx={{ height: 600, width: "100%" }}>
+        <Box sx={{ height: 600, width: "100%", display: "flex", flexDirection: "column", gap: 2 }}>
+
+            <CapabilityToolbar onCalculateMaturity={handleCalculateMaturity} />
 
             <DataGrid
 

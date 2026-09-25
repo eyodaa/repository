@@ -64,6 +64,14 @@ export const capabilityNodeService = {
 
         return response.data;
 
+    },
+
+    async calculateMaturity() {
+
+        const response = await api.post(`/nodes/calculate-maturity`);
+
+        return response.data;
+
     }
 
 };
