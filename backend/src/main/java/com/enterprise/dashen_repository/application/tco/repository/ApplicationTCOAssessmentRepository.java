@@ -18,6 +18,8 @@ public interface ApplicationTCOAssessmentRepository
 
         List<ApplicationTCOAssessment> findByApplicationId(Long applicationId);
 
+        void deleteByApplicationId(Long applicationId);
+
         boolean existsByApplicationIdAndAssessmentYear(
                         Long applicationId,
                         Integer assessmentYear);

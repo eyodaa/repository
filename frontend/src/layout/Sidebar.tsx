@@ -8,17 +8,21 @@ import {
     ListItemButton,
     ListItemIcon,
     ListItemText,
+    Divider,
 } from "@mui/material";
 import {
     ChevronLeft,
     ExpandLess,
     ExpandMore,
+    Logout,
+    People,
 } from "@mui/icons-material";
 
 import { navigation } from "./navigation";
 import { SIDEBAR_WIDTH } from "../theme/constants";
 import AppLogo from "../components/ui/AppLogo";
 import { useThemeContext } from "../theme/ThemeContextProvider";
+import { useAuth } from "../context/AuthContext";
 
 interface SidebarProps {
     open: boolean;
@@ -28,14 +32,13 @@ interface SidebarProps {
 export default function Sidebar({ open, onToggle }: SidebarProps) {
     const location = useLocation();
     const { mode } = useThemeContext();
+    const { user, logout } = useAuth();
 
     const DashboardIcon = navigation[0].icon as any;
-    const ReportsIcon = navigation[4]?.icon as any;
     const AdministrationIcon = navigation[5]?.icon as any;
 
     const [openArchitecture, setOpenArchitecture] = useState(true);
     const [openRelationships, setOpenRelationships] = useState(true);
-    const [openAnalytics, setOpenAnalytics] = useState(true);
 
     const sectionButtonSx = {
         minHeight: 38,
@@ -78,6 +81,20 @@ export default function Sidebar({ open, onToggle }: SidebarProps) {
         },
     };
 
+    // Filter architecture children based on role
+    const getFilteredArchitecture = () => {
+        if (!navigation[1]?.children) return [];
+        const items = navigation[1].children;
+        if (user?.role === 'SYSTEM_ADMIN') return items;
+        if (user?.role === 'APPLICATION_ADMIN') return items.filter(i => i.title === 'Applications');
+        if (user?.role === 'TECHNOLOGY_ADMIN') return items.filter(i => i.title === 'Technologies');
+        if (user?.role === 'BUSINESS_ADMIN') return items.filter(i => i.title === 'Capabilities');
+        if (user?.role === 'PROCESS_ADMIN') return items.filter(i => i.title === 'Processes');
+        return [];
+    };
+
+    const filteredArchitecture = getFilteredArchitecture();
+
     return (
         <Box
             sx={{
@@ -89,6 +106,8 @@ export default function Sidebar({ open, onToggle }: SidebarProps) {
                 overflowX: "hidden",
                 overflowY: "auto",
                 flexShrink: 0,
+                display: "flex",
+                flexDirection: "column",
                 transition: "width 0.22s cubic-bezier(0.4, 0, 0.2, 1)",
                 "&::-webkit-scrollbar": {
                     width: 5,
@@ -112,6 +131,7 @@ export default function Sidebar({ open, onToggle }: SidebarProps) {
                     justifyContent: "space-between",
                     borderBottom: 1,
                     borderColor: "divider",
+                    flexShrink: 0,
                 }}
             >
                 <Box sx={{ display: "flex", alignItems: "center", minWidth: 0 }}>
@@ -137,148 +157,153 @@ export default function Sidebar({ open, onToggle }: SidebarProps) {
             </Box>
 
             {/* Navigation List */}
-            <List sx={{ py: 1.5 }}>
-                {/* Dashboard */}
-                <ListItemButton
-                    component={Link}
-                    to="/"
-                    selected={location.pathname === "/"}
-                    sx={navigationButtonSx}
-                >
-                    <ListItemIcon>
-                        <DashboardIcon />
-                    </ListItemIcon>
-                    <ListItemText primary="Dashboard" />
-                </ListItemButton>
+            <Box sx={{ flexGrow: 1, overflowY: 'auto' }}>
+                <List sx={{ py: 1.5 }}>
+                    {user?.role === 'SYSTEM_ADMIN' && (
+                        <>
+                            {/* Dashboard */}
+                            <ListItemButton
+                                component={Link}
+                                to="/dashboard"
+                                selected={location.pathname === "/dashboard"}
+                                sx={navigationButtonSx}
+                            >
+                                <ListItemIcon>
+                                    <DashboardIcon />
+                                </ListItemIcon>
+                                <ListItemText primary="Dashboard" />
+                            </ListItemButton>
+                        </>
+                    )}
 
-                {/* Architecture */}
-                <ListItemButton
-                    onClick={() => setOpenArchitecture(!openArchitecture)}
-                    sx={sectionButtonSx}
-                >
-                    <ListItemText primary="Architecture" />
-                    {openArchitecture ? <ExpandLess /> : <ExpandMore />}
-                </ListItemButton>
+                    {/* Architecture */}
+                    {filteredArchitecture.length > 0 && (
+                        <>
+                            <ListItemButton
+                                onClick={() => setOpenArchitecture(!openArchitecture)}
+                                sx={sectionButtonSx}
+                            >
+                                <ListItemText primary="Architecture" />
+                                {openArchitecture ? <ExpandLess /> : <ExpandMore />}
+                            </ListItemButton>
 
-                <Collapse in={openArchitecture} timeout="auto" unmountOnExit>
-                    <List component="div" disablePadding>
-                        {navigation[1]?.children?.map((item) => {
-                            const Icon = item.icon;
-                            return (
+                            <Collapse in={openArchitecture} timeout="auto" unmountOnExit>
+                                <List component="div" disablePadding>
+                                    {filteredArchitecture.map((item: any) => {
+                                        const Icon = item.icon;
+                                        return (
+                                            <ListItemButton
+                                                key={item.title}
+                                                component={Link}
+                                                to={item.path ?? "#"}
+                                                selected={location.pathname === item.path}
+                                                sx={{
+                                                    ...navigationButtonSx,
+                                                    pl: 3.5,
+                                                }}
+                                            >
+                                                <ListItemIcon>
+                                                    <Icon />
+                                                </ListItemIcon>
+                                                <ListItemText primary={item.title} />
+                                            </ListItemButton>
+                                        );
+                                    })}
+                                </List>
+                            </Collapse>
+                        </>
+                    )}
+
+                    {user?.role === 'SYSTEM_ADMIN' && (
+                        <>
+                            {/* Relationships */}
+                            <ListItemButton
+                                onClick={() => setOpenRelationships(!openRelationships)}
+                                sx={sectionButtonSx}
+                            >
+                                <ListItemText primary="Relationships" />
+                                {openRelationships ? <ExpandLess /> : <ExpandMore />}
+                            </ListItemButton>
+
+                            <Collapse in={openRelationships} timeout="auto" unmountOnExit>
+                                <List component="div" disablePadding>
+                                    {navigation[2]?.children?.map((item: any) => {
+                                        const Icon = item.icon;
+                                        return (
+                                            <ListItemButton
+                                                key={item.title}
+                                                component={Link}
+                                                to={item.path ?? "#"}
+                                                selected={location.pathname === item.path}
+                                                sx={{
+                                                    ...navigationButtonSx,
+                                                    pl: 3.5,
+                                                }}
+                                            >
+                                                <ListItemIcon>
+                                                    <Icon />
+                                                </ListItemIcon>
+                                                <ListItemText primary={item.title} />
+                                            </ListItemButton>
+                                        );
+                                    })}
+                                </List>
+                            </Collapse>
+
+                        
+                            {/* Administration */}
+                            <ListItemButton
+                                onClick={() => {}}
+                                sx={sectionButtonSx}
+                            >
+                                <ListItemText primary="Administration" />
+                            </ListItemButton>
+                            <List component="div" disablePadding>
                                 <ListItemButton
-                                    key={item.title}
                                     component={Link}
-                                    to={item.path ?? "#"}
-                                    selected={location.pathname === item.path}
+                                    to="/administration"
+                                    selected={location.pathname === "/administration"}
                                     sx={{
                                         ...navigationButtonSx,
                                         pl: 3.5,
                                     }}
                                 >
                                     <ListItemIcon>
-                                        <Icon />
+                                        {AdministrationIcon && <AdministrationIcon />}
                                     </ListItemIcon>
-                                    <ListItemText primary={item.title} />
+                                    <ListItemText primary="Settings" />
                                 </ListItemButton>
-                            );
-                        })}
-                    </List>
-                </Collapse>
 
-                {/* Relationships */}
-                <ListItemButton
-                    onClick={() => setOpenRelationships(!openRelationships)}
-                    sx={sectionButtonSx}
-                >
-                    <ListItemText primary="Relationships" />
-                    {openRelationships ? <ExpandLess /> : <ExpandMore />}
-                </ListItemButton>
-
-                <Collapse in={openRelationships} timeout="auto" unmountOnExit>
-                    <List component="div" disablePadding>
-                        {navigation[2]?.children?.map((item) => {
-                            const Icon = item.icon;
-                            return (
                                 <ListItemButton
-                                    key={item.title}
                                     component={Link}
-                                    to={item.path ?? "#"}
-                                    selected={location.pathname === item.path}
+                                    to="/users"
+                                    selected={location.pathname === "/users"}
                                     sx={{
                                         ...navigationButtonSx,
                                         pl: 3.5,
                                     }}
                                 >
                                     <ListItemIcon>
-                                        <Icon />
+                                        <People />
                                     </ListItemIcon>
-                                    <ListItemText primary={item.title} />
+                                    <ListItemText primary="User Management" />
                                 </ListItemButton>
-                            );
-                        })}
-                    </List>
-                </Collapse>
+                            </List>
+                        </>
+                    )}
+                </List>
+            </Box>
 
-                {/* Analytics */}
-                <ListItemButton
-                    onClick={() => setOpenAnalytics(!openAnalytics)}
-                    sx={sectionButtonSx}
-                >
-                    <ListItemText primary="Analytics" />
-                    {openAnalytics ? <ExpandLess /> : <ExpandMore />}
-                </ListItemButton>
-
-                <Collapse in={openAnalytics} timeout="auto" unmountOnExit>
-                    <List component="div" disablePadding>
-                        {navigation[3]?.children?.map((item) => {
-                            const Icon = item.icon;
-                            return (
-                                <ListItemButton
-                                    key={item.title}
-                                    component={Link}
-                                    to={item.path ?? "#"}
-                                    selected={location.pathname === item.path}
-                                    sx={{
-                                        ...navigationButtonSx,
-                                        pl: 3.5,
-                                    }}
-                                >
-                                    <ListItemIcon>
-                                        <Icon />
-                                    </ListItemIcon>
-                                    <ListItemText primary={item.title} />
-                                </ListItemButton>
-                            );
-                        })}
-                    </List>
-                </Collapse>
-
-                {/* Reports */}
-                <ListItemButton
-                    component={Link}
-                    to="/reports"
-                    selected={location.pathname === "/reports"}
-                    sx={navigationButtonSx}
-                >
+            {/* Logout button at the bottom */}
+            <Box sx={{ p: 2 }}>
+                <Divider sx={{ mb: 2 }} />
+                <ListItemButton onClick={logout} sx={navigationButtonSx}>
                     <ListItemIcon>
-                        {ReportsIcon && <ReportsIcon />}
+                        <Logout />
                     </ListItemIcon>
-                    <ListItemText primary="Reports" />
+                    <ListItemText primary="Logout" />
                 </ListItemButton>
-
-                {/* Administration */}
-                <ListItemButton
-                    component={Link}
-                    to="/administration"
-                    selected={location.pathname === "/administration"}
-                    sx={navigationButtonSx}
-                >
-                    <ListItemIcon>
-                        {AdministrationIcon && <AdministrationIcon />}
-                    </ListItemIcon>
-                    <ListItemText primary="Administration" />
-                </ListItemButton>
-            </List>
+            </Box>
         </Box>
     );
 }

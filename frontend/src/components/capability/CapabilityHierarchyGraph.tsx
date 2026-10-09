@@ -253,6 +253,19 @@ const CapabilityNodeCard = memo(({ data }: NodeProps) => {
             Leaf
           </span>
         )}
+
+        <span
+          style={{
+            background: "rgba(148, 163, 184, 0.2)",
+            color: "#cbd5e1",
+            padding: "2px 8px",
+            borderRadius: "4px",
+            fontSize: "11px",
+            fontWeight: 600,
+          }}
+        >
+          T: {node.targetMaturity ?? "-"}
+        </span>
       </div>
 
       {/* Bottom Connection Handle */}

@@ -32,6 +32,8 @@ export function buildGraph(
     options: BuildOptions
 ): BuildResult {
 
+    if (!graph) return { nodes: [], edges: [] };
+
     const {
         selectedTypes,
         selectedRelationships,
@@ -58,7 +60,7 @@ export function buildGraph(
     // Relationship filter
     // -------------------------------------------------
 
-    const filteredEdges = graph.edges.filter(edge => {
+    const filteredEdges = (graph.edges || []).filter(edge => {
 
         const relationshipType =
             normalizeType(edge.type);
@@ -87,7 +89,7 @@ export function buildGraph(
     // Node filter
     // -------------------------------------------------
 
-    const filteredNodes = graph.nodes.filter(node => {
+    const filteredNodes = (graph.nodes || []).filter(node => {
 
         const nodeType =
             normalizeType(node.type);

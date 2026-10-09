@@ -12,6 +12,8 @@ public interface TCOSummaryRepository
 
     Optional<TCOSummary> findByAssessmentId(Long assessmentId);
 
+    void deleteByAssessmentId(Long assessmentId);
+
     @Query("""
             SELECT COALESCE(SUM(s.grandTotal), 0)
             FROM TCOSummary s

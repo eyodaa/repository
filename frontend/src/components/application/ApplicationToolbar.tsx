@@ -7,6 +7,7 @@ import {
 
 import AddIcon from "@mui/icons-material/Add";
 import UploadIcon from "@mui/icons-material/Upload";
+import ViewQuiltIcon from "@mui/icons-material/ViewQuilt";
 
 interface ApplicationToolbarProps {
     search: string;
@@ -15,6 +16,7 @@ interface ApplicationToolbarProps {
 
     onAdd: () => void;
     onImport?: () => void;
+    onLandscapeView?: () => void;
 }
 
 export default function ApplicationToolbar({
@@ -22,6 +24,7 @@ export default function ApplicationToolbar({
     onSearchChange,
     onAdd,
     onImport,
+    onLandscapeView,
 }: ApplicationToolbarProps) {
 
     return (
@@ -55,6 +58,14 @@ export default function ApplicationToolbar({
                 onClick={() => onImport?.()}
             >
                 Import
+            </Button>
+
+            <Button
+                variant="outlined"
+                startIcon={<ViewQuiltIcon />}
+                onClick={() => onLandscapeView?.()}
+            >
+                Landscape View
             </Button>
 
             <Button

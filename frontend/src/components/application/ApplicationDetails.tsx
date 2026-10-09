@@ -300,27 +300,15 @@ export default function ApplicationDetailsPage() {
                     </Button>
 
                 </Paper>
-                <Box>
+                <Button
+                    variant="contained"
+                    onClick={() =>
+                        navigate(`/blueprint/${application.id}`)
+                    }
+                >
+                    Blueprint
+                </Button>
 
-                    <Typography variant="h6">
-
-                        Dependency Graph
-
-                    </Typography>
-
-                    <Typography
-                        variant="body2"
-                        color="text.secondary"
-                        sx={{ mt: 1 }}
-                    >
-
-                        Explore all applications, technologies,
-                        capabilities and processes connected to this
-                        application using the interactive enterprise graph.
-
-                    </Typography>
-
-                </Box>
                 <Button
                     variant="contained"
                     onClick={() =>

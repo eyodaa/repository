@@ -3,7 +3,10 @@ import {
     Chip,
     CircularProgress,
     Alert,
+    IconButton,
 } from "@mui/material";
+
+import DeleteIcon from "@mui/icons-material/Delete";
 
 import {
     DataGrid,
@@ -21,6 +24,7 @@ import type { Application } from "../../types/application";
 
 interface ApplicationTableProps {
     search: string;
+    onDelete?: (id: number) => void;
 }
 
 const columns: GridColDef[] = [
@@ -169,6 +173,7 @@ const columns: GridColDef[] = [
 
 export default function ApplicationTable({
     search,
+    onDelete,
 }: ApplicationTableProps) {
 
     const navigate = useNavigate();
@@ -292,6 +297,31 @@ export default function ApplicationTable({
         );
     };
 
+    const tableColumns = [...columns];
+    
+    if (onDelete) {
+        tableColumns.push({
+            field: "actions",
+            headerName: "Actions",
+            width: 120,
+            sortable: false,
+            filterable: false,
+            renderCell: (params) => (
+                <Box>
+                    <IconButton
+                        color="error"
+                        onClick={(event) => {
+                            event.stopPropagation();
+                            onDelete(params.row.id);
+                        }}
+                    >
+                        <DeleteIcon />
+                    </IconButton>
+                </Box>
+            ),
+        });
+    }
+
     if (loading) {
 
         return (
@@ -331,7 +361,7 @@ export default function ApplicationTable({
                 rows={
                     filteredApplications
                 }
-                columns={columns}
+                columns={tableColumns}
 
                 getRowId={(row) =>
                     row.id

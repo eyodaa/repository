@@ -4,21 +4,19 @@ import {
     Badge,
     Box,
     IconButton,
-    InputBase,
-    Paper,
     Toolbar,
     Typography,
 } from "@mui/material";
 
 import {
     NotificationsNone,
-    Search,
     Menu,
     MenuOpen,
     LightMode,
     DarkMode,
 } from "@mui/icons-material";
 import { useThemeContext } from "../theme/ThemeContextProvider";
+import { useAuth } from "../context/AuthContext";
 
 interface TopbarProps {
     sidebarOpen: boolean;
@@ -30,6 +28,7 @@ export default function Topbar({
     onToggleSidebar,
 }: TopbarProps) {
     const { mode, toggleTheme } = useThemeContext();
+    const { user } = useAuth();
 
     return (
         <AppBar
@@ -87,72 +86,6 @@ export default function Topbar({
                 >
                     Enterprise Dashboard
                 </Typography>
-
-                {/* Search */}
-
-                <Paper
-                    elevation={0}
-                    sx={{
-                        display: {
-                            xs: "none",
-                            sm: "flex",
-                        },
-                        alignItems: "center",
-
-                        px: 1.5,
-                        py: 0.5,
-
-                        width: {
-                            sm: 260,
-                            md: 360,
-                        },
-
-                        height: 44,
-
-                        mr: {
-                            sm: 1,
-                            md: 2,
-                        },
-
-                        bgcolor: "background.paper",
-
-                        border: 1,
-                        borderColor: "divider",
-
-                        borderRadius: "24px",
-
-                        boxShadow:
-                            mode === 'light' ? "0 2px 6px rgba(15, 23, 42, 0.04)" : "0 2px 6px rgba(0,0,0,0.2)",
-
-                        "&:focus-within": {
-                            borderColor: "primary.light",
-                            boxShadow:
-                                "0 0 0 3px rgba(37, 99, 235, 0.08)",
-                        },
-                    }}
-                >
-                    <Search
-                        sx={{
-                            color: "text.secondary",
-                            mr: 1,
-                            fontSize: 24,
-                        }}
-                    />
-
-                    <InputBase
-                        placeholder="Search applications..."
-                        fullWidth
-                        sx={{
-                            color: "text.primary",
-
-                            "& input::placeholder": {
-                                color: "text.disabled",
-                                opacity: 1,
-                            },
-                        }}
-                    />
-                </Paper>
-
                 {/* Theme Toggle */}
                 <IconButton
                     onClick={toggleTheme}
@@ -210,7 +143,7 @@ export default function Topbar({
                             fontWeight: 600,
                         }}
                     >
-                        D
+                        {user?.username?.charAt(0).toUpperCase() || 'U'}
                     </Avatar>
 
                     <Box
@@ -229,7 +162,7 @@ export default function Topbar({
                                 lineHeight: 1.3,
                             }}
                         >
-                            Danayt
+                            {user?.username || 'Guest'}
                         </Typography>
 
                         <Typography
@@ -239,7 +172,7 @@ export default function Topbar({
                                 whiteSpace: "nowrap",
                             }}
                         >
-                            Enterprise Architect
+                            {user?.role?.replace('_', ' ') || 'No Role'}
                         </Typography>
                     </Box>
                 </Box>

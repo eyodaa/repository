@@ -50,7 +50,7 @@ public class CapabilityNode {
     private Double currentMaturity;
 
     @Column(name = "target_maturity")
-    private Double targetMaturity;
+    private Double targetMaturity = 5.0;
 
     @Column(name = "maturity_gap")
     private Double maturityGap;
