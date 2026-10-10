@@ -27,9 +27,7 @@ frontend/dist/
 # Logs
 *.log
 
-# Database backups
-*.sql
-*.dump
+
 
 # OS files
 .DS_Store
