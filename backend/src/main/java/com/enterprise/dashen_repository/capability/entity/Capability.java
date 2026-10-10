@@ -17,7 +17,7 @@ public class Capability extends Artifact {
     private Integer maturityLevel;
 
     @Column(name = "target_maturity")
-    private Double targetMaturity;
+    private Double targetMaturity = 5.0;
 
     public Capability() {
         setArtifactType(ArtifactType.CAPABILITY);

@@ -8,6 +8,8 @@ import {
 } from "@mui/material";
 
 import { useApplications } from "../../hooks/useApplications";
+import { useEffect, useState } from "react";
+import { applicationService } from "../../services/applicationService";
 
 export default function PortfolioStatistics() {
 
@@ -15,7 +17,14 @@ export default function PortfolioStatistics() {
         applications,
         loading,
     } = useApplications();
-
+    const [totalCost, setTotalCost] = useState<number>(0);
+    useEffect(() => {
+        applicationService.getTotalCost()
+            .then(res => {
+                setTotalCost(res.data);
+            })
+            .catch(console.error);
+    }, []);
     if (loading) {
         return (
             <Box
@@ -33,7 +42,7 @@ export default function PortfolioStatistics() {
     const totalApplications = applications.length;
 
     const activeApplications = applications.filter(
-        app => app.lifecycleStatus === "ACTIVE"
+        app => app.lifecycleStatus === "Active"
     ).length;
 
     const statistics = [
@@ -54,7 +63,10 @@ export default function PortfolioStatistics() {
         },
         {
             title: "Annual TCO",
-            value: "N/A",
+            value: `£${Number(totalCost).toLocaleString(undefined, {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2,
+            })}`,
             color: "#7b1fa2",
         },
     ];
@@ -90,7 +102,7 @@ export default function PortfolioStatistics() {
                                 }}
                             >
                                 <Typography
-                                    variant="h3"
+                                    variant="h5"
                                     sx={{
                                         color: item.color,
                                         fontWeight: 700,

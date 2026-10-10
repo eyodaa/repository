@@ -15,9 +15,13 @@ import java.util.List;
 public class CapabilityNodeController {
 
     private final CapabilityNodeService service;
+    private final com.enterprise.dashen_repository.capability_node.node_service.CapabilityMaturityService maturityService;
 
-    public CapabilityNodeController(CapabilityNodeService service) {
+    public CapabilityNodeController(
+            CapabilityNodeService service,
+            com.enterprise.dashen_repository.capability_node.node_service.CapabilityMaturityService maturityService) {
         this.service = service;
+        this.maturityService = maturityService;
     }
 
     @GetMapping
@@ -67,5 +71,10 @@ public class CapabilityNodeController {
     @GetMapping("/tree")
     public List<CapabilityTreeDto> getTree() {
         return service.getTree();
+    }
+
+    @PostMapping("/calculate-maturity")
+    public void calculateMaturity() {
+        maturityService.calculateAllMaturity();
     }
 }

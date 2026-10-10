@@ -26,8 +26,6 @@ export default function Building({
 
     id,
 
-    name,
-
     x,
 
     z,

@@ -72,7 +72,7 @@ export default function EnterpriseScene({
             const graph: GraphResponse =
                 await graphService.getEnterpriseGraph();
 
-            const city = layoutCity(graph.nodes);
+            const city = layoutCity(graph.nodes || []);
 
             setBuildings(city.buildings);
 

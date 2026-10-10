@@ -42,4 +42,9 @@ public class GraphController {
         return graphService.getDependencyTree(id);
     }
 
+    @GetMapping("/{id}/impact")
+    public GraphResponse getImpactGraph(@PathVariable Long id) {
+        return graphService.getImpactGraph(id);
+    }
+
 }

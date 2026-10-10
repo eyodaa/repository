@@ -1,4 +1,4 @@
-import { Paper, Typography, Divider, Stack } from "@mui/material";
+import { Paper, Typography, Divider } from "@mui/material";
 
 import GraphSearch from "./left/GraphSearch";
 import ArtifactFilters from "./left/ArtifactFilters";
@@ -8,12 +8,19 @@ import GraphLegend from "./left/GraphLegend";
 interface Props {
     selectedTypes?: Set<string>;
     onToggleType?: (type: string) => void;
+
+    selectedRelationships?: Set<string>;
+    onToggleRelationship?: (relationship: string) => void;
 }
 
-export default function LeftPanel({ selectedTypes, onToggleType }: Props) {
+export default function LeftPanel({
+    selectedTypes,
+    onToggleType,
+    selectedRelationships,
+    onToggleRelationship
+}: Props) {
 
     return (
-
         <Paper
             sx={{
                 height: "100%",
@@ -38,7 +45,10 @@ export default function LeftPanel({ selectedTypes, onToggleType }: Props) {
 
             <Divider sx={{ my: 2 }} />
 
-            <RelationshipFilters />
+            <RelationshipFilters
+                selectedRelationships={selectedRelationships}
+                onToggleRelationship={onToggleRelationship}
+            />
 
             <Divider sx={{ my: 2 }} />
 

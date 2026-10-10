@@ -30,6 +30,9 @@ export const applicationService = {
     getAnalysis(applicationId: number | string) {
         return api.get(`/application-analysis/${applicationId}`);
     },
+    getTotalCost() {
+        return api.get("/applications/total-cost");
+    },
     import(file: File) {
         const formData = new FormData();
         formData.append("file", file);

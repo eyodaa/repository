@@ -24,6 +24,9 @@ public class CapabilityService {
     }
 
     public Capability save(Capability capability) {
+        if (capability.getTargetMaturity() == null) {
+            capability.setTargetMaturity(5.0);
+        }
         return repository.save(capability);
     }
 

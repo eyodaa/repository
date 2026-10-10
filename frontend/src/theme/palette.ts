@@ -1,27 +1,31 @@
 export const palette = {
     background: {
         // Main application background
-        default: "#08111F",
+        default: "#F8FAFC",
 
         // Large containers
-        paper: "#101B2D",
+        paper: "#FFFFFF",
 
         // Sidebar
-        sidebar: "#0C1627",
+        sidebar: "#FFFFFF",
 
         // Cards
-        card: "#172437",
+        card: "#FFFFFF",
 
-        // Hover state
-        surface: "#22324A",
+        // Hover / surface
+        surface: "#EFF6FF",
     },
 
     primary: {
-        main: "#38BDF8",
+        main: "#2563EB",
+        light: "#60A5FA",
+        dark: "#1D4ED8",
     },
 
     secondary: {
-        main: "#6366F1",
+        main: "#7C3AED",
+        light: "#A78BFA",
+        dark: "#6D28D9",
     },
 
     success: {
@@ -36,10 +40,11 @@ export const palette = {
         main: "#EF4444",
     },
 
-    divider: "rgba(255,255,255,0.08)",
+    divider: "#E2E8F0",
 
     text: {
-        primary: "#F8FAFC",
-        secondary: "#94A3B8",
+        primary: "#172554",
+        secondary: "#64748B",
+        disabled: "#94A3B8",
     },
 };

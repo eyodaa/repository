@@ -4,18 +4,19 @@ import {
     Badge,
     Box,
     IconButton,
-    InputBase,
-    Paper,
     Toolbar,
     Typography,
 } from "@mui/material";
 
 import {
     NotificationsNone,
-    Search,
     Menu,
     MenuOpen,
+    LightMode,
+    DarkMode,
 } from "@mui/icons-material";
+import { useThemeContext } from "../theme/ThemeContextProvider";
+import { useAuth } from "../context/AuthContext";
 
 interface TopbarProps {
     sidebarOpen: boolean;
@@ -26,23 +27,45 @@ export default function Topbar({
     sidebarOpen,
     onToggleSidebar,
 }: TopbarProps) {
+    const { mode, toggleTheme } = useThemeContext();
+    const { user } = useAuth();
+
     return (
         <AppBar
             position="static"
             elevation={0}
             color="inherit"
             sx={{
-                borderBottom: "1px solid #E5E7EB",
+                bgcolor: "background.paper",
+                color: "text.primary",
+                borderBottom: 1,
+                borderColor: "divider",
+                flexShrink: 0,
             }}
         >
-            <Toolbar>
-
+            <Toolbar
+                sx={{
+                    minHeight: "72px !important",
+                    px: {
+                        xs: 2,
+                        md: 3,
+                    },
+                }}
+            >
                 {/* Sidebar Toggle */}
 
                 <IconButton
                     edge="start"
                     onClick={onToggleSidebar}
-                    sx={{ mr: 2 }}
+                    sx={{
+                        mr: 2,
+                        color: "text.secondary",
+
+                        "&:hover": {
+                            backgroundColor: "action.hover",
+                            color: "primary.main",
+                        },
+                    }}
                 >
                     {sidebarOpen ? <MenuOpen /> : <Menu />}
                 </IconButton>
@@ -54,42 +77,42 @@ export default function Topbar({
                     sx={{
                         flexGrow: 1,
                         fontWeight: 700,
+                        color: "text.primary",
+                        fontSize: {
+                            xs: "1.2rem",
+                            md: "1.7rem",
+                        },
                     }}
                 >
                     Enterprise Dashboard
                 </Typography>
-
-                {/* Search */}
-
-                <Paper
-                    elevation={0}
+                {/* Theme Toggle */}
+                <IconButton
+                    onClick={toggleTheme}
                     sx={{
-                        display: "flex",
-                        alignItems: "center",
-                        px: 2,
-                        py: 0.5,
-                        width: 320,
-                        mr: 3,
-                        border: "1px solid #E5E7EB",
-                        borderRadius: 3,
+                        color: "text.secondary",
+                        mr: 1,
+                        "&:hover": {
+                            backgroundColor: "action.hover",
+                            color: "primary.main",
+                        },
                     }}
                 >
-                    <Search
-                        sx={{
-                            color: "text.secondary",
-                            mr: 1,
-                        }}
-                    />
-
-                    <InputBase
-                        placeholder="Search applications..."
-                        fullWidth
-                    />
-                </Paper>
+                    {mode === 'dark' ? <LightMode /> : <DarkMode />}
+                </IconButton>
 
                 {/* Notifications */}
 
-                <IconButton>
+                <IconButton
+                    sx={{
+                        color: "text.secondary",
+
+                        "&:hover": {
+                            backgroundColor: "action.hover",
+                            color: "primary.main",
+                        },
+                    }}
+                >
                     <Badge
                         color="error"
                         badgeContent={4}
@@ -104,29 +127,55 @@ export default function Topbar({
                     sx={{
                         display: "flex",
                         alignItems: "center",
-                        ml: 3,
-                        gap: 1,
+                        ml: {
+                            xs: 1,
+                            md: 2,
+                        },
+                        gap: 1.2,
                     }}
                 >
-                    <Avatar>D</Avatar>
+                    <Avatar
+                        sx={{
+                            width: 42,
+                            height: 42,
+                            bgcolor: mode === 'light' ? "#DBEAFE" : "#1E3A8A",
+                            color: mode === 'light' ? "#1D4ED8" : "#93C5FD",
+                            fontWeight: 600,
+                        }}
+                    >
+                        {user?.username?.charAt(0).toUpperCase() || 'U'}
+                    </Avatar>
 
-                    <Box>
+                    <Box
+                        sx={{
+                            display: {
+                                xs: "none",
+                                sm: "block",
+                            },
+                        }}
+                    >
                         <Typography
                             variant="body2"
-
+                            sx={{
+                                fontWeight: 600,
+                                color: "text.primary",
+                                lineHeight: 1.3,
+                            }}
                         >
-                            Danayt
+                            {user?.username || 'Guest'}
                         </Typography>
 
                         <Typography
                             variant="caption"
-                            color="text.secondary"
+                            sx={{
+                                color: "text.secondary",
+                                whiteSpace: "nowrap",
+                            }}
                         >
-                            Enterprise Architect
+                            {user?.role?.replace('_', ' ') || 'No Role'}
                         </Typography>
                     </Box>
                 </Box>
-
             </Toolbar>
         </AppBar>
     );

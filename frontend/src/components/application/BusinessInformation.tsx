@@ -96,7 +96,24 @@ export default function BusinessInformation({ application, onUpdate }: BusinessI
                         <Typography>{application.businessOwner || "N/A"}</Typography>
                     )}
                 </Grid>
+                <Grid size={{ xs: 12, md: 6 }}>
+                    <Typography color="text.secondary">
+                        Department
+                    </Typography>
 
+                    {isEditing ? (
+                        <TextField
+                            fullWidth
+                            size="small"
+                            value={formData.department || ""}
+                            onChange={handleChange("department")}
+                        />
+                    ) : (
+                        <Typography>
+                            {application.department || "N/A"}
+                        </Typography>
+                    )}
+                </Grid>
                 <Grid size={{ xs: 12, md: 6 }}>
                     <Typography color="text.secondary">Support Group</Typography>
                     {isEditing ? (

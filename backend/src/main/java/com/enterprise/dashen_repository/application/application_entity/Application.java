@@ -22,6 +22,7 @@ public class Application extends Artifact {
     private String technicalOwner;
 
     private String businessCriticality;
+    private String department;
 
     // ==========================
     // APPLICATION INFORMATION
@@ -242,4 +243,13 @@ public class Application extends Artifact {
     public void setRetirementDate(LocalDate retirementDate) {
         this.retirementDate = retirementDate;
     }
+
+    public void setDepartment(String department) {
+        this.department = department;
+    }
+
+    public String getDepartment() {
+        return department;
+    }
+
 }

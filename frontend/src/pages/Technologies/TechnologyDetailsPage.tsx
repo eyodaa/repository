@@ -8,9 +8,10 @@ import {
     CircularProgress,
     Alert,
     Button,
+    Paper,
 } from "@mui/material";
 
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 
 import { technologyService } from "../../services/technologyService";
 
@@ -25,6 +26,8 @@ import EditTechnologyDialog from "../../components/technology/EditTechnologyDial
 export default function TechnologyDetailsPage() {
 
     const { id } = useParams();
+
+    const navigate = useNavigate();
 
     const [technology, setTechnology] =
         useState<Technology | null>(null);
@@ -186,6 +189,77 @@ export default function TechnologyDetailsPage() {
             <TechnologyRelationshipTable
                 artifactId={technology.id}
             />
+
+            <Paper
+                elevation={0}
+                sx={{
+                    mt: 4,
+                    p: 4,
+                    borderRadius: 3,
+                    display: "flex",
+                    justifyContent: "space-between",
+                    alignItems: "center",
+                    border: "1px solid",
+                    borderColor: "divider",
+                }}
+            >
+
+                <Box>
+
+                    <Typography variant="h6">
+
+                        Dependency Graph
+
+                    </Typography>
+
+                    <Typography
+                        variant="body2"
+                        color="text.secondary"
+                        sx={{ mt: 1 }}
+                    >
+
+                        Explore all applications, technologies,
+                        capabilities and processes connected to this
+                        technology using the interactive enterprise graph.
+
+                    </Typography>
+
+                </Box>
+
+                <Box sx={{ display: "flex", gap: 2 }}>
+
+                    <Button
+                        variant="contained"
+                        onClick={() =>
+                            navigate(`/impact/${technology.id}`)
+                        }
+                    >
+                        Impact Analysis
+                    </Button>
+
+                    <Button
+                        variant="contained"
+                        size="large"
+                        onClick={() =>
+                            navigate(`/graph/technology/${technology.id}`)
+                        }
+                    >
+
+                        Open Graph
+
+                    </Button>
+                    <Button
+                        variant="contained"
+                        onClick={() =>
+                            navigate(`/blueprint/${technology.id}`)
+                        }
+                    >
+                        Blueprint
+                    </Button>
+
+                </Box>
+
+            </Paper>
 
             <EditTechnologyDialog
 

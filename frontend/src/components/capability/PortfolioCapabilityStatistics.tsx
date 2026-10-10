@@ -8,24 +8,27 @@ export default function PortfolioCapabilityStatistics() {
 
     const totalCapabilities = capabilities.length;
 
-    const rootCapabilities = capabilities.filter(
-        capability => capability.parentId === null
-    ).length;
-
-    const averageMaturity = capabilities.length === 0
-        ? 0
-        : (
-            capabilities.reduce(
-                (sum, capability) => sum + (capability.maturityLevel ?? 0),
-                0
-            ) / capabilities.length
-        ).toFixed(1);
 
     const averageTarget = capabilities.length === 0
         ? 0
         : (
             capabilities.reduce(
                 (sum, capability) => sum + (capability.targetMaturity ?? 0),
+                0
+            ) / capabilities.length
+        ).toFixed(1);
+
+    const totalParents = new Set(
+        capabilities
+            .map(c => c.parentId || c.parentId)
+            .filter(id => id != null)
+    ).size;
+
+    const totalAverage = capabilities.length === 0
+        ? 0
+        : (
+            capabilities.reduce(
+                (sum, capability) => sum + (((capability.maturityLevel ?? capability.maturityLevel ?? 0) + (capability.targetMaturity ?? 0)) / 2),
                 0
             ) / capabilities.length
         ).toFixed(1);
@@ -39,21 +42,21 @@ export default function PortfolioCapabilityStatistics() {
         },
 
         {
-            title: "Root Capabilities",
-            value: rootCapabilities,
-            color: "#2e7d32",
-        },
-
-        {
-            title: "Average Maturity",
-            value: averageMaturity,
-            color: "#ed6c02",
+            title: "Root Capability",
+            value: totalParents,
+            color: "#6e355aff",
         },
 
         {
             title: "Average Target",
             value: averageTarget,
             color: "#7b1fa2",
+        },
+
+        {
+            title: "Total Average",
+            value: totalAverage,
+            color: "#0288d1",
         },
 
     ];

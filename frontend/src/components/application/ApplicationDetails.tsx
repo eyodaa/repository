@@ -254,28 +254,69 @@ export default function ApplicationDetailsPage() {
                     borderColor: "divider",
                 }}
             >
+                <Paper
+                    elevation={0}
+                    sx={{
+                        mt: 4,
+                        p: 4,
+                        borderRadius: 3,
+                        border: "1px solid",
+                        borderColor: "divider",
+                        display: "flex",
+                        justifyContent: "space-between",
+                        alignItems: "center",
+                    }}
+                >
 
-                <Box>
+                    <Box>
 
-                    <Typography variant="h6">
+                        <Typography variant="h6">
 
-                        Dependency Graph
+                            TCO costs
 
-                    </Typography>
+                        </Typography>
 
-                    <Typography
-                        variant="body2"
-                        color="text.secondary"
-                        sx={{ mt: 1 }}
+                        <Typography
+                            variant="body2"
+                            color="text.secondary"
+                            sx={{ mt: 1 }}
+                        >
+
+                            Manage yearly Total Cost of Ownership assessments for this application.
+
+                        </Typography>
+
+                    </Box>
+
+                    <Button
+                        variant="contained"
+                        onClick={() =>
+                            navigate(`/applications/${application.id}/tco`)
+                        }
                     >
 
-                        Explore all applications, technologies,
-                        capabilities and processes connected to this
-                        application using the interactive enterprise graph.
+                        Open TCO Assessment
 
-                    </Typography>
+                    </Button>
 
-                </Box>
+                </Paper>
+                <Button
+                    variant="contained"
+                    onClick={() =>
+                        navigate(`/blueprint/${application.id}`)
+                    }
+                >
+                    Blueprint
+                </Button>
+
+                <Button
+                    variant="contained"
+                    onClick={() =>
+                        navigate(`/impact/${application.id}`)
+                    }
+                >
+                    Impact Analysis
+                </Button>
 
                 <Button
                     variant="contained"

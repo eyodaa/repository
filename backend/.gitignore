@@ -1,33 +1,87 @@
+# ==========================================
+# Spring Boot / Maven
+# ==========================================
 HELP.md
 target/
 .mvn/wrapper/maven-wrapper.jar
+
 !**/src/main/**/target/
 !**/src/test/**/target/
 
-### STS ###
+# ==========================================
+# Spring Tool Suite (STS)
+# ==========================================
 .apt_generated
 .classpath
 .factorypath
 .project
-.settings
+.settings/
 .springBeans
-.sts4-cache
+.sts4-cache/
 
-### IntelliJ IDEA ###
-.idea
+# ==========================================
+# IntelliJ IDEA
+# ==========================================
+.idea/
 *.iws
 *.iml
 *.ipr
 
-### NetBeans ###
+# ==========================================
+# NetBeans
+# ==========================================
 /nbproject/private/
 /nbbuild/
 /dist/
 /nbdist/
 /.nb-gradle/
 build/
+
 !**/src/main/**/build/
 !**/src/test/**/build/
 
-### VS Code ###
+# ==========================================
+# Visual Studio Code
+# ==========================================
 .vscode/
+
+# ==========================================
+# Node / React / Vite
+# ==========================================
+node_modules/
+frontend/node_modules/
+
+dist/
+frontend/dist/
+
+.vite/
+frontend/.vite/
+
+# ==========================================
+# Environment / Secrets
+# ==========================================
+.env
+.env.*
+!.env.example
+
+# ==========================================
+# Logs
+# ==========================================
+*.log
+
+# ==========================================
+# Docker
+# ==========================================
+docker-compose.override.yml
+
+# ==========================================
+# Operating System
+# ==========================================
+.DS_Store
+Thumbs.db
+
+# ==========================================
+# Temporary files
+# ==========================================
+*.tmp
+*.temp

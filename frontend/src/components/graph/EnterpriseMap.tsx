@@ -29,7 +29,7 @@ export default function EnterpriseMap() {
 
             const graph = await graphService.getEnterpriseGraph();
 
-            const flowNodes: Node[] = graph.nodes.map(
+            const flowNodes: Node[] = (graph.nodes || []).map(
                 (node: any, index: number) => ({
 
                     id: String(node.id),
@@ -57,7 +57,7 @@ export default function EnterpriseMap() {
                 })
             );
 
-            const flowEdges: Edge[] = graph.edges.map(
+            const flowEdges: Edge[] = (graph.edges || []).map(
                 (edge: any) => ({
 
                     id: String(edge.id),

@@ -1,6 +1,6 @@
 import type { Node } from "@xyflow/react";
 
-export interface BuildingNodeData {
+export interface BuildingNodeData extends Record<string, unknown> {
     label: string;
     type: string;
 }

@@ -37,7 +37,7 @@ export default function AnimatedRelation({
 
         if (!material) return;
 
-        material.dashOffset -= delta * 5;
+        (material as any).dashOffset -= delta * 5;
 
     });
 
@@ -47,7 +47,7 @@ export default function AnimatedRelation({
             ref={line}
             points={points}
             dashed
-            material={material}
+            material={material as any}
         />
 
     );

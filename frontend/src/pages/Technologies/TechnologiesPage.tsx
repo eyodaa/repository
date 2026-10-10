@@ -8,7 +8,6 @@ import {
 } from "@mui/material";
 
 import TechnologyToolbar from "../../components/technology/TechnologyToolbar";
-import TechnologyStatistics from "../../components/technology/TechnologyStatistics";
 import TechnologyTable from "../../components/technology/TechnologyTable";
 import CreateTechnologyDialog from "../../components/technology/CreateTechnologyDialog";
 

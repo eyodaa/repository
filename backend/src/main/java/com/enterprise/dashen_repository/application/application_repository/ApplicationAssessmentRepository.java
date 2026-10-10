@@ -9,4 +9,6 @@ public interface ApplicationAssessmentRepository extends JpaRepository<Applicati
 
     Optional<ApplicationAssessment> findByApplicationId(Long applicationId);
 
+    void deleteByApplicationId(Long applicationId);
+
 }

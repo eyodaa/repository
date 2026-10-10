@@ -8,4 +8,6 @@ public interface ApplicationAnalysisRepository
         extends JpaRepository<ApplicationAnalysis, Long> {
 
     Optional<ApplicationAnalysis> findByApplicationId(Long applicationId);
+
+    void deleteByApplicationId(Long applicationId);
 }

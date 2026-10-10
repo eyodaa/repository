@@ -107,7 +107,7 @@ export default function GeneralInformation({ application, onUpdate }: GeneralInf
 
 
                 <Grid size={{ xs: 12, md: 6 }}>
-                    <Typography color="text.secondary">Owner</Typography>
+                    <Typography color="text.secondary">Technical Owner</Typography>
                     {isEditing ? (
                         <TextField
                             fullWidth

@@ -6,12 +6,13 @@ import PortfolioStatistics from "../../components/application/PortfolioStatistic
 import ApplicationTable from "../../components/application/ApplicationTable";
 import CreateApplicationDialog from "../../components/application/CreateApplicationDialog";
 import ApplicationImportDialog from "../../components/application/ApplicationImportDialog";
+import { applicationService } from "../../services/applicationService";
+
+import { useNavigate } from "react-router-dom";
 
 export default function ApplicationsPage() {
-
+    const navigate = useNavigate();
     const [search, setSearch] = useState("");
-    const [status, setStatus] = useState("");
-    const [criticality, setCriticality] = useState("");
 
     const [openCreateDialog, setOpenCreateDialog] = useState(false);
     const [openImportDialog, setOpenImportDialog] = useState(false);
@@ -20,18 +21,29 @@ export default function ApplicationsPage() {
         window.location.reload();
     };
 
+    const handleDelete = async (id: number) => {
+        if (!window.confirm("Delete this application?")) {
+            return;
+        }
+
+        try {
+            await applicationService.delete(id);
+            window.location.reload();
+        } catch (err) {
+            console.error(err);
+            alert("Unable to delete application.");
+        }
+    };
+
     return (
         <Box sx={{ p: 3 }}>
 
             <ApplicationToolbar
                 search={search}
-                status={status}
-                criticality={criticality}
                 onSearchChange={setSearch}
-                onStatusChange={setStatus}
-                onCriticalityChange={setCriticality}
                 onAdd={() => setOpenCreateDialog(true)}
                 onImport={() => setOpenImportDialog(true)}
+                onLandscapeView={() => navigate("/applications/landscape")}
             />
 
             <Box sx={{ mt: 3 }}>
@@ -46,7 +58,10 @@ export default function ApplicationsPage() {
                         height: 650,
                     }}
                 >
-                    <ApplicationTable />
+                    <ApplicationTable
+                        search={search}
+                        onDelete={handleDelete}
+                    />
                 </Paper>
             </Box>
 

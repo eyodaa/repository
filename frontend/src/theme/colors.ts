@@ -1,23 +1,33 @@
 export const colors = {
-    background: "#0F172A",
-    surface: "#1E293B",
-    card: "#162033",
+    background: "#F8FAFC",
 
-    border: "#334155",
+    surface: "#FFFFFF",
 
-    primary: "#3B82F6",
-    secondary: "#8B5CF6",
+    card: "#FFFFFF",
+
+    border: "#E2E8F0",
+
+    primary: "#2563EB",
+
+    secondary: "#7C3AED",
 
     success: "#22C55E",
+
     warning: "#F59E0B",
+
     danger: "#EF4444",
 
-    text: "#F8FAFC",
-    textSecondary: "#94A3B8",
+    text: "#172554",
 
-    capability: "#3B82F6",
+    textSecondary: "#64748B",
+
+    capability: "#2563EB",
+
     application: "#06B6D4",
-    technology: "#8B5CF6",
+
+    technology: "#7C3AED",
+
     process: "#10B981",
-    relationship: "#F59E0B"
+
+    relationship: "#F59E0B",
 };

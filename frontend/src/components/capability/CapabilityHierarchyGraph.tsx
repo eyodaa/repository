@@ -155,13 +155,29 @@ const CapabilityNodeCard = memo(({ data }: NodeProps) => {
   const node = data.node as CapabilityNode;
   const onNodeClick = data.onNodeClick as ((node: CapabilityNode) => void) | undefined;
 
+  let borderColor = isLeaf ? "#22c55e" : "#3b82f6";
+  let bgColor = isLeaf ? "rgba(34, 197, 94, 0.08)" : "rgba(59, 130, 246, 0.08)";
+
+  if (node.currentMaturity !== null && node.currentMaturity !== undefined) {
+    if (node.currentMaturity === 5) {
+      borderColor = "#10b981"; // green
+      bgColor = "rgba(16, 185, 129, 0.1)";
+    } else if (node.currentMaturity >= 3) {
+      borderColor = "#f59e0b"; // amber
+      bgColor = "rgba(245, 158, 11, 0.1)";
+    } else {
+      borderColor = "#ef4444"; // red
+      bgColor = "rgba(239, 68, 68, 0.1)";
+    }
+  }
+
   return (
     <div
       onClick={() => onNodeClick?.(node)}
       style={{
         padding: "14px 16px",
-        background: isLeaf ? "rgba(34, 197, 94, 0.08)" : "rgba(59, 130, 246, 0.08)",
-        border: isLeaf ? "1.5px solid #22c55e" : "1.5px solid #3b82f6",
+        background: bgColor,
+        border: `1.5px solid ${borderColor}`,
         borderRadius: "10px",
         width: `${NODE_WIDTH}px`,
         boxSizing: "border-box",
@@ -176,7 +192,7 @@ const CapabilityNodeCard = memo(({ data }: NodeProps) => {
         type="target"
         position={Position.Top}
         style={{
-          background: isLeaf ? "#22c55e" : "#3b82f6",
+          background: borderColor,
           width: 8,
           height: 8,
           border: "none",
@@ -237,6 +253,19 @@ const CapabilityNodeCard = memo(({ data }: NodeProps) => {
             Leaf
           </span>
         )}
+
+        <span
+          style={{
+            background: "rgba(148, 163, 184, 0.2)",
+            color: "#cbd5e1",
+            padding: "2px 8px",
+            borderRadius: "4px",
+            fontSize: "11px",
+            fontWeight: 600,
+          }}
+        >
+          T: {node.targetMaturity ?? "-"}
+        </span>
       </div>
 
       {/* Bottom Connection Handle */}
@@ -244,7 +273,7 @@ const CapabilityNodeCard = memo(({ data }: NodeProps) => {
         type="source"
         position={Position.Bottom}
         style={{
-          background: isLeaf ? "#22c55e" : "#3b82f6",
+          background: borderColor,
           width: 8,
           height: 8,
           border: "none",

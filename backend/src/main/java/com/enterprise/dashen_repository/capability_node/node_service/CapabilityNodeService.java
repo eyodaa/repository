@@ -41,6 +41,9 @@ public class CapabilityNodeService {
     }
 
     public CapabilityNode save(CapabilityNode node) {
+        if (node.getTargetMaturity() == null) {
+            node.setTargetMaturity(5.0);
+        }
         return repository.save(node);
     }
 
